@@ -7,6 +7,7 @@ module unze.ptf.routevision_final {
     requires net.synedra.validatorfx;
     requires org.kordamp.ikonli.javafx;
     requires org.kordamp.bootstrapfx.core;
+    requires java.sql;
 
     opens unze.ptf.routevision_final to javafx.fxml;
     exports unze.ptf.routevision_final;

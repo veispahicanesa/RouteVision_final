@@ -1,9 +1,6 @@
 package unze.ptf.routevision_final.repository;
-
-
 import unze.ptf.routevision_final.config.DatabaseConfig;
 import unze.ptf.routevision_final.model.Tura;
-
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,27 +18,28 @@ public class TuraDAO {
     }
 
     public List<Tura> findAll() throws SQLException {
-        List<Tura> putovanja = new ArrayList<>();
+        List<Tura> tura = new ArrayList<>();
         String query = "SELECT * FROM tura WHERE aktivan = TRUE ORDER BY datum_pocetka DESC";
         try (Connection conn = DatabaseConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
             ResultSet rs = stmt.executeQuery();
-            while (rs.next()) putovanja.add(mapResultSetToPutovanje(rs));
+            while (rs.next()) tura.add(mapResultSetToPutovanje(rs));
         }
-        return putovanja;
+        return tura;
     }
 
     public List<Tura> findByVozacId(int vozacId) throws SQLException {
-        List<Tura> putovanja = new ArrayList<>();
+        List<Tura> tura = new ArrayList<>();
         String query = "SELECT * FROM tura WHERE vozac_id = ? AND aktivan = TRUE";
         try (Connection conn = DatabaseConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setInt(1, vozacId);
             ResultSet rs = stmt.executeQuery();
-            while (rs.next()) putovanja.add(mapResultSetToPutovanje(rs));
+            while (rs.next()) tura.add(mapResultSetToPutovanje(rs));
         }
-        return putovanja;
+        return tura;
     }
+
 
     public void save(Tura tura) throws SQLException {
         String query = "INSERT INTO tura (broj_tura, vozac_id, kamion_id, narudba_id, datum_pocetka, vrijeme_pocetka, datum_kraja, vrijeme_kraja, lokacija_pocetka, lokacija_kraja, prijedeni_kilometri, prosjecna_brzina, spent_fuel, fuel_used, napomena, status, aktivan) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";

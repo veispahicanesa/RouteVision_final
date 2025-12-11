@@ -8,6 +8,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.*;
+
 // DAO klasa za pristup tabeli 'admin'. Sadrži metode za dohvat,
 // spremanje i mapiranje Admin objekata iz baze podataka.
 public class AdminDAO {

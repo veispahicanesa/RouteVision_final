@@ -8,6 +8,7 @@ module unze.ptf.routevision_final {
     requires org.kordamp.ikonli.javafx;
     requires org.kordamp.bootstrapfx.core;
     requires java.sql;
+    requires jbcrypt;
 
     opens unze.ptf.routevision_final to javafx.fxml;
     exports unze.ptf.routevision_final;

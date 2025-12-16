@@ -1,5 +1,6 @@
 package unze.ptf.routevision_final.service;
 
+import org.mindrot.jbcrypt.BCrypt;
 import unze.ptf.routevision_final.model.Admin;
 import unze.ptf.routevision_final.model.Vozac;
 import unze.ptf.routevision_final.repository.AdminDAO;
@@ -34,5 +35,17 @@ public class AuthService {
     public void registerVozac(String ime, String prezime, String email, String password, String broj_vozacke_dozvole) throws SQLException {
         Vozac vozac = new Vozac(ime, prezime, email, SecurityService.hashPassword(password), broj_vozacke_dozvole);
         vozacDAO.save(vozac);
+    }
+
+    public static class SecurityService {
+        private static final int LOG_ROUNDS = 12;
+
+        public static String hashPassword(String password) {
+            return BCrypt.hashpw(password, BCrypt.gensalt(LOG_ROUNDS));
+        }
+
+        public static boolean verifyPassword(String password, String hashedPassword) {
+            return BCrypt.checkpw(password, hashedPassword);
+        }
     }
 }

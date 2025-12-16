@@ -14,7 +14,7 @@ public class Launcher {
         Scanner sc = new Scanner(System.in);
         AuthService authService = new AuthService();
 
-        System.out.println("=== ROUTEVISION ===");
+        System.out.println("ROUTEVISION ");
         System.out.println("1. Admin");
         System.out.println("2. Vozač");
         System.out.print("Izaberite ulogu: ");

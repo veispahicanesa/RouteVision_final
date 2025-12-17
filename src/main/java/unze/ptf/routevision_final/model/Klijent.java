@@ -1,7 +1,11 @@
 package unze.ptf.routevision_final.model;
 
 import java.time.LocalDateTime;
-
+/*
+ * Model klasa Klijent predstavlja poslovnog ili privatnog klijenta firme.
+ * Koristi se za čuvanje podataka o klijentima, njihovim kontaktima,
+ * finansijskim informacijama i statusu u sistemu.
+ */
 public class Klijent {
     private int id;
     private String naziv_firme;
@@ -31,7 +35,7 @@ public class Klijent {
         this.aktivan = true;
     }
 
-    // Getters and Setters
+
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
 

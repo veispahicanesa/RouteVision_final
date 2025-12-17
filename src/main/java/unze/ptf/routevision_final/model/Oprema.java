@@ -3,6 +3,11 @@ package unze.ptf.routevision_final.model;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+/*
+ * Model klasa Oprema predstavlja dodatnu ili pomoćnu opremu u sistemu.
+ * Oprema može biti vezana za određeni kamion ili postojati samostalno.
+ * Koristi se za evidenciju stanja, kapaciteta i datuma provjera opreme.
+ */
 
 public class Oprema {
     private int id;
@@ -25,7 +30,7 @@ public class Oprema {
         this.aktivan = true;
     }
 
-    // Getters and Setters
+
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
 

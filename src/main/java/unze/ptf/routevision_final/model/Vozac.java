@@ -5,7 +5,11 @@ package unze.ptf.routevision_final.model;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-
+/*
+ * Model klasa Vozac predstavlja jednog vozača u sistemu.
+ * Čuva osnovne podatke o vozaču, kontakt, dozvolu, datum zaposlenja, plate i statistiku tura.
+ * Takođe prati status aktivnosti i datum kreiranja zapisa.
+ */
 public class Vozac {
     private int id;
     private String ime;
@@ -34,7 +38,7 @@ public class Vozac {
         this.aktivan = true;
     }
 
-    // Getters and Setters
+
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
 

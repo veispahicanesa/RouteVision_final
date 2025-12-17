@@ -7,7 +7,11 @@ import unze.ptf.routevision_final.repository.AdminDAO;
 import unze.ptf.routevision_final.repository.VozacDAO;
 
 import java.sql.SQLException;
-
+/*
+ * AuthService - Servis za autentifikaciju i registraciju korisnika.
+ * Podržava logovanje i registraciju za Admina i Vozača.
+ * Lozinke se hash-uju pomoću BCrypt metode.
+ */
 public class AuthService {
     private AdminDAO adminDAO = new AdminDAO();
     private VozacDAO vozacDAO = new VozacDAO();

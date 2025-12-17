@@ -3,7 +3,11 @@ package unze.ptf.routevision_final.model;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-
+/*
+ * Model klasa ServisniDnevnik služi za evidenciju servisa kamiona.
+ * Čuva podatke o datumu servisa, vrsti, kilometraži, troškovima
+ * i dodatnim napomenama vezanim za održavanje vozila.
+ */
 public class ServisniDnevnik {
     private int id;
     private int kamion_id;
@@ -27,7 +31,7 @@ public class ServisniDnevnik {
         this.aktivan = true;
     }
 
-    // Getters and Setters
+
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
 

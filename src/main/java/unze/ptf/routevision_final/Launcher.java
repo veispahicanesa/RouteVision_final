@@ -42,7 +42,7 @@ public class Launcher {
                 return;
             }
 
-            // ===== ADMIN =====
+            //  ADMIN
             if (korisnik instanceof Admin) {
                 System.out.println("Ulogovani ste kao ADMIN.");
 
@@ -90,7 +90,7 @@ public class Launcher {
                 }
             }
 
-            // ===== VOZAČ =====
+            // VOZAČ
             if (korisnik instanceof Vozac) {
                 Vozac vozac = (Vozac) korisnik;
                 System.out.println("Ulogovani ste kao vozač.");

@@ -4,7 +4,11 @@ package unze.ptf.routevision_final.model;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-
+/*
+ * Model klasa Tura predstavlja jednu rutu/kamionsku vožnju.
+ * Čuva podatke o vozilu, vozaču, narudžbi, vremenu i lokacijama.
+ * Takođe prati kilometražu, potrošnju goriva i status ture.
+ */
 public class Tura {
     private int id;
     private String broj_tura;
@@ -37,7 +41,7 @@ public class Tura {
         this.status = "U toku";
     }
 
-    // Getters and Setters
+
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
 

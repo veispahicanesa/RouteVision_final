@@ -1,7 +1,10 @@
 package unze.ptf.routevision_final.service;
 
 import org.mindrot.jbcrypt.BCrypt;
-
+/*
+ * SecurityService - Servis za sigurnu obradu lozinki.
+ * Omogućava hash-ovanje lozinki i provjeru lozinke protiv hash-a koristeći BCrypt.
+ */
 public class SecurityService {
     private static final int LOG_ROUNDS = 12;
 

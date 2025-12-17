@@ -5,7 +5,10 @@ import unze.ptf.routevision_final.model.Kamion;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-
+/*
+ * KamionDAO - klasa koja upravlja CRUD operacijama nad tabelom kamion u bazi.
+ * Omogućava pronalazak, dodavanje, ažuriranje i brisanje kamiona.
+ */
 public class KamionDAO {
     public Kamion findById(int id) throws SQLException {
         String query = "SELECT * FROM kamion WHERE id = ? AND aktivan = TRUE";

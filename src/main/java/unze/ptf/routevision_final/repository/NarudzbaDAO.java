@@ -6,7 +6,10 @@ import unze.ptf.routevision_final.model.Narudzba;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-
+/*
+ * NarudzbaDAO - CRUD klasa za tabelu Narudzba.
+ * Omogućava kreiranje, čitanje, ažuriranje i logičko brisanje narudžbi u bazi.
+ */
 public class NarudzbaDAO {
 
     public Narudzba findById(int id) throws SQLException {

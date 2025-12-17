@@ -6,7 +6,10 @@ import unze.ptf.routevision_final.model.Oprema;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-
+/*
+ * OpremaDAO - CRUD klasa za tabelu Oprema.
+ * Omogućava kreiranje, čitanje, ažuriranje i logičko brisanje opreme u bazi.
+ */
 public class OpremaDAO {
     public Oprema findById(int id) throws SQLException {
         String query = "SELECT * FROM oprema WHERE id = ? AND aktivan = TRUE";

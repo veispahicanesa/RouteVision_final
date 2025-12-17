@@ -7,6 +7,10 @@ import unze.ptf.routevision_final.model.Fakture;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+/*
+ * RacunDAO - CRUD klasa za tabelu Fakture/Racun.
+ * Omogućava kreiranje, čitanje, ažuriranje i logičko brisanje faktura u bazi.
+ */
 
 public class RacunDAO {
     public Fakture findById(int id) throws SQLException {

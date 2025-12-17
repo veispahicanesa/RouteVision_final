@@ -5,7 +5,10 @@ import unze.ptf.routevision_final.model.Klijent;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-
+/*
+ * KamionDAO - CRUD klasa za tabelu Kamion.
+ * Omogućava kreiranje, čitanje, ažuriranje i logičko brisanje kamiona u bazi.
+ */
 public class KlijentDAO {
     public Klijent findById(int id) throws SQLException {
         String query = "SELECT * FROM klijent WHERE id = ? AND aktivan = TRUE";

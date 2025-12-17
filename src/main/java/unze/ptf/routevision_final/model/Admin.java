@@ -1,7 +1,7 @@
 package unze.ptf.routevision_final.model;
 
 import java.time.LocalDateTime;
-
+//Ova klasa se koristi kao mapa između baze podataka i aplikacije
 public class Admin {
     private int id;
     private String ime;
@@ -23,7 +23,7 @@ public class Admin {
         this.aktivan = true;
     }
 
-    // Geteri i seteri
+
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
 

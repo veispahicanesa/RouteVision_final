@@ -3,7 +3,11 @@ package unze.ptf.routevision_final.model;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-
+/*
+ * Model klasa Narudzba predstavlja narudžbu klijenta.
+ * Koristi se za evidenciju robe, količine, lokacija preuzimanja i dostave,
+ * kao i statusa obrade narudžbe.
+ */
 public class Narudzba {
     private int id;
     private String broj_narudzbe;
@@ -22,6 +26,7 @@ public class Narudzba {
 
     public Narudzba() {}
 
+
     public Narudzba(String broj_narudzbe, int klijent_id) {
         this.broj_narudzbe = broj_narudzbe;
         this.klijent_id = klijent_id;
@@ -29,7 +34,7 @@ public class Narudzba {
         this.status = "Novoprijavljena";
     }
 
-    // Getters and Setters
+
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
 

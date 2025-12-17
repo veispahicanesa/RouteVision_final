@@ -4,7 +4,10 @@ import unze.ptf.routevision_final.model.Tura;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-
+/*
+ * TuraDAO - CRUD klasa za tabelu Tura/Putovanje.
+ * Omogućava kreiranje, čitanje, ažuriranje i logičko brisanje tura u bazi.
+ */
 public class TuraDAO {
     public Tura findById(int id) throws SQLException {
         String query = "SELECT * FROM putovanje WHERE id = ? AND aktivan = TRUE";

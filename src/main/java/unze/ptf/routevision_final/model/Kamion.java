@@ -4,7 +4,11 @@ package unze.ptf.routevision_final.model;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-
+/*
+ * Model klasa Kamion predstavlja vozilo (kamion) u sistemu.
+ * Koristi se za evidenciju kamiona, tehničkih podataka,
+ * dodijeljenog vozača i statusa vozila.
+ */
 public class Kamion {
     private int id;
     private String registarska_tablica;
@@ -30,7 +34,7 @@ public class Kamion {
         this.aktivan = true;
     }
 
-    // Getters and Setters
+
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
 

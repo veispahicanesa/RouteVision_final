@@ -3,7 +3,7 @@ package unze.ptf.routevision_final.model;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-
+//Koristi se za evidenciju usluga, iznosa, poreza i statusa plaćanja.
 public class Fakture {
     private int id;
     private String broj_fakture;

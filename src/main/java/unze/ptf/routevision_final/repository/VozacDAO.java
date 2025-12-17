@@ -6,7 +6,10 @@ import unze.ptf.routevision_final.model.Vozac;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-
+/*
+ * VozacDAO - CRUD klasa za tabelu Vozac.
+ * Omogućava kreiranje, čitanje, ažuriranje i logičko brisanje vozača u bazi.
+ */
 public class VozacDAO {
     public Vozac findByEmail(String email) throws SQLException {
         String query = "SELECT * FROM vozac WHERE email = ? AND aktivan = TRUE";

@@ -1,8 +1,6 @@
 package unze.ptf.routevision_final.controller;
 
-/*
-* sluzi da znamo ko je trenunto prijavljen,njegova uloga,njegov ID
-**/
+
 public class SessionManager {
     private static SessionManager instance;
     private Object currentUser;

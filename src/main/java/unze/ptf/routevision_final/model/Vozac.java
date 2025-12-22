@@ -16,6 +16,8 @@ public class Vozac {
     private String prezime;
     private String email;
     private String lozinka;
+    private Integer kamionId; // Novo
+    private Integer opremaId; // Novo
     private String broj_telefona;
     private String broj_vozacke_dozvole;
     private String kategorija_dozvole;
@@ -54,6 +56,12 @@ public class Vozac {
     public String getLozinka() { return lozinka; }
     public void setLozinka(String lozinka) { this.lozinka = lozinka; }
 
+
+    public Integer getKamionId() { return kamionId; }
+    public void setKamionId(Integer kamionId) { this.kamionId = kamionId; }
+
+    public Integer getOpremaId() { return opremaId; }
+    public void setOpremaId(Integer opremaId) { this.opremaId = opremaId; }
     public String getBroj_telefona() { return broj_telefona; }
     public void setBroj_telefona(String broj_telefona) { this.broj_telefona = broj_telefona; }
 

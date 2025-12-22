@@ -2,7 +2,6 @@ package unze.ptf.routevision_final.repository;
 
 import unze.ptf.routevision_final.config.DatabaseConfig;
 import unze.ptf.routevision_final.model.ServisniDnevnik;
-
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,45 +29,45 @@ public class ServisniDnevnikDAO {
         return servisi;
     }
 
-    public List<ServisniDnevnik> findByKamionId(int kamionId) throws SQLException {
+    public List<ServisniDnevnik> findForVozac(int vozacId) throws SQLException {
         List<ServisniDnevnik> servisi = new ArrayList<>();
-        String query = "SELECT * FROM servisni_dnevnik WHERE kamion_id = ? AND aktivan = TRUE";
+        String query = "SELECT * FROM servisni_dnevnik WHERE vozac_id = ? AND aktivan = TRUE ORDER BY datum_servisa DESC";
         try (Connection conn = DatabaseConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setInt(1, kamionId);
+            stmt.setInt(1, vozacId);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) servisi.add(mapResultSetToServisniDnevnik(rs));
         }
         return servisi;
     }
 
-    public void save(ServisniDnevnik servisi) throws SQLException {
+    public void save(ServisniDnevnik s) throws SQLException {
         String query = "INSERT INTO servisni_dnevnik (kamion_id, vozac_id, datum_servisa, vrsta_servisa, opisServisa, km_na_servisu, troskovi, serviser_naziv, napomena, aktivan) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = DatabaseConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setInt(1, servisi.getKamion_id());
-            stmt.setObject(2, servisi.getVozac_id());
-            stmt.setDate(3, Date.valueOf(servisi.getDatum_servisa()));
-            stmt.setString(4, servisi.getVrsta_servisa());
-            stmt.setString(5, servisi.getOpisServisa());
-            stmt.setInt(6, servisi.getKm_na_servisu());
-            stmt.setDouble(7, servisi.getTroskovi());
-            stmt.setString(8, servisi.getServiser_naziv());
-            stmt.setString(9, servisi.getNapomena());
-            stmt.setBoolean(10, servisi.isAktivan());
+            stmt.setInt(1, s.getKamion_id());
+            stmt.setObject(2, s.getVozac_id());
+            stmt.setDate(3, Date.valueOf(s.getDatum_servisa()));
+            stmt.setString(4, s.getVrsta_servisa());
+            stmt.setString(5, s.getOpisServisa());
+            stmt.setInt(6, s.getKm_na_servisu());
+            stmt.setDouble(7, s.getTroskovi());
+            stmt.setString(8, s.getServiser_naziv());
+            stmt.setString(9, s.getNapomena());
+            stmt.setBoolean(10, true);
             stmt.executeUpdate();
         }
     }
 
-    public void update(ServisniDnevnik servisi) throws SQLException {
+    public void update(ServisniDnevnik s) throws SQLException {
         String query = "UPDATE servisni_dnevnik SET vrsta_servisa = ?, opisServisa = ?, troskovi = ?, serviser_naziv = ? WHERE id = ?";
         try (Connection conn = DatabaseConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setString(1, servisi.getVrsta_servisa());
-            stmt.setString(2, servisi.getOpisServisa());
-            stmt.setDouble(3, servisi.getTroskovi());
-            stmt.setString(4, servisi.getServiser_naziv());
-            stmt.setInt(5, servisi.getId());
+            stmt.setString(1, s.getVrsta_servisa());
+            stmt.setString(2, s.getOpisServisa());
+            stmt.setDouble(3, s.getTroskovi());
+            stmt.setString(4, s.getServiser_naziv());
+            stmt.setInt(5, s.getId());
             stmt.executeUpdate();
         }
     }
@@ -83,20 +82,15 @@ public class ServisniDnevnikDAO {
     }
 
     private ServisniDnevnik mapResultSetToServisniDnevnik(ResultSet rs) throws SQLException {
-        ServisniDnevnik dnevnik = new ServisniDnevnik();
-        dnevnik.setId(rs.getInt("id"));
-        dnevnik.setKamion_id(rs.getInt("kamion_id"));
-        dnevnik.setVozac_id(rs.getObject("vozac_id") != null ? rs.getInt("vozac_id") : null);
-        dnevnik.setDatum_servisa(rs.getDate("datum_servisa").toLocalDate());
-        dnevnik.setVrsta_servisa(rs.getString("vrsta_servisa"));
-        dnevnik.setOpisServisa(rs.getString("opisServisa"));
-        dnevnik.setKm_na_servisu(rs.getInt("km_na_servisu"));
-        dnevnik.setTroskovi(rs.getDouble("troskovi"));
-        dnevnik.setServiser_naziv(rs.getString("serviser_naziv"));
-        dnevnik.setNapomena(rs.getString("napomena"));
-        dnevnik.setDatoteka_path(rs.getString("datoteka_path"));
-        dnevnik.setAktivan(rs.getBoolean("aktivan"));
-        dnevnik.setDatum_kreiranja(rs.getTimestamp("datum_kreiranja") != null ? rs.getTimestamp("datum_kreiranja").toLocalDateTime() : null);
-        return dnevnik;
+        ServisniDnevnik d = new ServisniDnevnik();
+        d.setId(rs.getInt("id"));
+        d.setKamion_id(rs.getInt("kamion_id"));
+        d.setVozac_id(rs.getObject("vozac_id") != null ? rs.getInt("vozac_id") : null);
+        d.setDatum_servisa(rs.getDate("datum_servisa").toLocalDate());
+        d.setVrsta_servisa(rs.getString("vrsta_servisa"));
+        d.setTroskovi(rs.getDouble("troskovi"));
+        d.setServiser_naziv(rs.getString("serviser_naziv"));
+        d.setAktivan(rs.getBoolean("aktivan"));
+        return d;
     }
 }

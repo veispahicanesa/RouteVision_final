@@ -3,13 +3,20 @@ package unze.ptf.routevision_final.config;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-// konekcija sa bazom podataka
 
+// Konekcija sa cloud bazom podataka (Aiven MySQL) – brzo rješenje za test/demo
 public class DatabaseConfig {
-    private static final String URL = "jdbc:mysql://localhost:3306/bazapodataka";
-    private static final String USER = "root";
-    private static final String PASSWORD = "Minela1!";
-//Static blok se izvršava prilikom učitavanja klase.
+
+    // URL baze – SSL uključeno, ali certifikat se ne provjerava
+    private static final String URL =
+            "jdbc:mysql://mysql-routevision-routevisiondb.l.aivencloud.com:15856/AivenCloud"
+                    + "?useSSL=true"
+                    + "&verifyServerCertificate=false"; // ⚠️ ne provjerava certifikat, ali radi za demo
+
+    private static final String USER = "avnadmin";
+    private static final String PASSWORD = "sifra";
+
+    // Učitavanje MySQL JDBC drajvera
     static {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
@@ -18,7 +25,7 @@ public class DatabaseConfig {
         }
     }
 
-//vraća aktivnu konekciju sa bazom podataka.
+    // Metoda koja vraća konekciju na bazu
     public static Connection getConnection() throws SQLException {
         return DriverManager.getConnection(URL, USER, PASSWORD);
     }

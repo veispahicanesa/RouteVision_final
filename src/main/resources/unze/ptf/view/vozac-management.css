@@ -1,0 +1,46 @@
+.management-container {
+    -fx-background-color: #ffffff;
+}
+
+.title-label {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1e88e5;
+}
+
+.button-box {
+    -fx-padding: 5px 0px;
+}
+
+/* Osnovni stil za svu dugmad */
+.button {
+    -fx-text-fill: white;
+    -fx-padding: 10 20;
+    -fx-font-size: 12px;
+    -fx-cursor: hand;
+}
+
+.btn-add {
+    -fx-background-color: #4caf50;
+}
+.btn-add:hover { -fx-background-color: #43a047; }
+
+.btn-edit {
+    -fx-background-color: #1e88e5;
+}
+.btn-edit:hover { -fx-background-color: #1976d2; }
+
+.btn-delete {
+    -fx-background-color: #f44336;
+}
+.btn-delete:hover { -fx-background-color: #d32f2f; }
+
+.btn-refresh {
+    -fx-background-color: #ff9800;
+}
+.btn-refresh:hover { -fx-background-color: #f57c00; }
+
+.table-view {
+    -fx-background-color: transparent;
+    -fx-font-size: 12px;
+}

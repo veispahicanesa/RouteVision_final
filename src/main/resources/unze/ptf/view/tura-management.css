@@ -1,0 +1,62 @@
+/* Glavni kontejner */
+.management-container {
+    -fx-background-color: #f4f7f6;
+}
+
+/* Naslov */
+.title-label {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2c3e50;
+}
+
+.button-box {
+    -fx-padding: 5px 0px;
+}
+
+/* Zajednički stil za gumbe */
+.button {
+    -fx-text-fill: white;
+    -fx-padding: 10 20;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+    -fx-background-radius: 3px;
+}
+
+/* Dugme: Završi Turu (Zeleno kao btn-paid/btn-add) */
+.btn-complete {
+    -fx-background-color: #2ecc71;
+}
+.btn-complete:hover {
+    -fx-background-color: #27ae60;
+}
+
+/* Dugme: Osvježi (Sivo) */
+.btn-refresh {
+    -fx-background-color: #95a5a6;
+}
+.btn-refresh:hover {
+    -fx-background-color: #7f8c8d;
+}
+.btn-status-blue { -fx-background-color: #3498db; -fx-text-fill: white; }
+.btn-status-green { -fx-background-color: #2ecc71; -fx-text-fill: white; }
+.btn-status-red { -fx-background-color: #e67e22; -fx-text-fill: white; } /* Narandžasto-crvena */
+
+.btn-status-blue:hover, .btn-status-green:hover, .btn-status-red:hover {
+    -fx-opacity: 0.8;
+}
+/* Tabela */
+.table-view {
+    -fx-background-color: white;
+    -fx-background-radius: 5px;
+    -fx-border-color: #dcdde1;
+}
+
+.table-view .column-header {
+    -fx-background-color: #f8f9fa;
+    -fx-padding: 10px;
+    -fx-border-color: transparent transparent #dcdde1 transparent;
+}
+
+/* Stil za status 'ZAVRŠENO' unutar tabele bi se mogao dodati preko CellFactory-a u Javi */

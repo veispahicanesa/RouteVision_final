@@ -1,0 +1,46 @@
+/* Header */
+.header-bar {
+    -fx-background-color: #1a252f; /* Tamno plava */
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 10, 0, 0, 5);
+}
+
+/* Sidebar */
+.sidebar {
+    -fx-background-color: #2c3e50;
+    -fx-padding: 10px;
+}
+
+/* Dinamički meni gumbi */
+.menu-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: #bdc3c7;
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 12 15;
+    -fx-font-size: 14px;
+    -fx-cursor: hand;
+    -fx-border-width: 0 0 0 4;
+    -fx-border-color: transparent;
+}
+
+.menu-button:hover {
+    -fx-background-color: #34495e;
+    -fx-text-fill: white;
+    -fx-border-color: #3498db; /* Plava linija sa strane */
+}
+
+/* Logout Button */
+.logout-button {
+    -fx-background-color: #e74c3c;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+
+.logout-button:hover {
+    -fx-background-color: #c0392b;
+}
+
+/* Content Area */
+.content-pane {
+    -fx-background-color: #f4f7f6;
+}

@@ -1,0 +1,49 @@
+.title-label {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1e88e5;
+}
+
+.info-section {
+    -fx-border-color: #e0e0e0;
+    -fx-border-width: 1;
+    -fx-padding: 15;
+    -fx-background-color: #f9f9f9;
+}
+
+.section-title {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #263238;
+}
+
+.key-label {
+    -fx-font-weight: bold;
+    -fx-text-fill: #555555;
+}
+
+.value-label {
+    -fx-text-fill: #333333;
+}
+
+.btn-edit {
+    -fx-background-color: #1e88e5;
+    -fx-text-fill: white;
+    -fx-padding: 10 20;
+    -fx-font-size: 12px;
+}
+
+.btn-password {
+    -fx-background-color: #ff6f00;
+    -fx-text-fill: white;
+    -fx-padding: 10 20;
+    -fx-font-size: 12px;
+}
+
+.error-label {
+    -fx-text-fill: #d32f2f;
+}
+
+.placeholder-label {
+    -fx-text-fill: #999999;
+}

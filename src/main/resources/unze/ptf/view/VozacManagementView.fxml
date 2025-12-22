@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox fx:id="mainContainer" spacing="15.0" styleClass="management-container" stylesheets="@vozac-management.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="unze.ptf.routevision_final.controller.VozacController">
+    <padding>
+        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+    </padding>
+    <children>
+        <Label styleClass="title-label" text="Upravljanje Vozačima" />
+
+        <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="button-box">
+            <children>
+                <Button mnemonicParsing="false" onAction="#handleAddVozac" styleClass="btn-add" text="Dodaj Vozača" />
+                <Button mnemonicParsing="false" onAction="#handleEditVozac" styleClass="btn-edit" text="Uredi" />
+                <Button mnemonicParsing="false" onAction="#handleDeleteVozac" styleClass="btn-delete" text="Obriši" />
+                <Button mnemonicParsing="false" onAction="#handleRefresh" styleClass="btn-refresh" text="Osvježi" />
+            </children>
+        </HBox>
+
+        <TableView fx:id="tableView" VBox.vgrow="ALWAYS">
+            <columns>
+                <TableColumn fx:id="idCol" prefWidth="50.0" text="ID" />
+                <TableColumn fx:id="imeCol" prefWidth="120.0" text="Ime" />
+                <TableColumn fx:id="prezimeCol" prefWidth="120.0" text="Prezime" />
+                <TableColumn fx:id="emailCol" prefWidth="180.0" text="Email" />
+                <TableColumn fx:id="dozvoleCol" prefWidth="150.0" text="Vozačka Dozvola" />
+                <TableColumn fx:id="turaCol" prefWidth="100.0" text="Ture" /> </columns>
+            <columnResizePolicy>
+                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+            </columnResizePolicy>
+        </TableView>
+    </children>
+</VBox>

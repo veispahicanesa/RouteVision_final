@@ -1,0 +1,16 @@
+.title-label {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1e88e5;
+}
+
+.button {
+    -fx-text-fill: white;
+    -fx-padding: 10 20;
+    -fx-font-size: 12px;
+}
+
+.btn-add { -fx-background-color: #4caf50; }
+.btn-edit { -fx-background-color: #1e88e5; }
+.btn-delete { -fx-background-color: #f44336; }
+.btn-refresh { -fx-background-color: #ff9800; }

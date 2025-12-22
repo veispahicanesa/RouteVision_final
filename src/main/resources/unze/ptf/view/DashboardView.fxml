@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane fx:id="rootLayout" prefHeight="700.0" prefWidth="1000.0" stylesheets="@dashboard.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="unze.ptf.routevision_final.controller.DashboardController">
+
+    <top>
+        <HBox alignment="CENTER_LEFT" prefHeight="60.0" styleClass="header-bar" BorderPane.alignment="CENTER">
+            <children>
+                <Label text="RouteVision PRO" textFill="WHITE">
+                    <font>
+                        <Font name="System Bold" size="20.0" />
+                    </font>
+                    <HBox.margin>
+                        <Insets left="20.0" />
+                    </HBox.margin>
+                </Label>
+                <HBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
+                    <children>
+                        <Label fx:id="userLabel" text="Korisnik: Ime Prezime (Role)" textFill="WHITE">
+                            <HBox.margin>
+                                <Insets right="20.0" />
+                            </HBox.margin>
+                        </Label>
+                        <Button mnemonicParsing="false" onAction="#handleLogout" styleClass="logout-button" text="Odjava">
+                            <HBox.margin>
+                                <Insets right="20.0" />
+                            </HBox.margin>
+                        </Button>
+                    </children>
+                </HBox>
+            </children>
+        </HBox>
+    </top>
+
+    <left>
+        <VBox fx:id="sideMenu" prefWidth="220.0" spacing="5.0" styleClass="sidebar" BorderPane.alignment="CENTER">
+            <padding>
+                <Insets top="20.0" />
+            </padding>
+        </VBox>
+    </left>
+
+    <center>
+        <VBox fx:id="contentArea" alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="20.0" styleClass="content-pane" BorderPane.alignment="CENTER">
+            <children>
+                <Label text="Dobrodošli u RouteVision" textFill="#7f8c8d">
+                    <font>
+                        <Font size="24.0" />
+                    </font>
+                </Label>
+                <Label text="Odaberite opciju iz menija sa lijeve strane." textFill="#95a5a6" />
+            </children>
+        </VBox>
+    </center>
+</BorderPane>

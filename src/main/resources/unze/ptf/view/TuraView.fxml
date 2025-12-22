@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox spacing="15.0" styleClass="management-container" stylesheets="@tura-management.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="unze.ptf.routevision_final.controller.TuraController">
+    <padding>
+        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+    </padding>
+    <children>
+        <Label styleClass="title-label" text="Upravljanje Turama" />
+
+        <HBox spacing="10.0" styleClass="button-box" alignment="CENTER_LEFT">
+            <children>
+                <Button onAction="#handleRefresh" styleClass="btn-refresh" text="Osvježi" />
+                <Separator orientation="VERTICAL" />
+                <Button onAction="#handleStatusInProgress" styleClass="btn-status-blue" text="U toku" />
+                <Button onAction="#handleZavrsiTuru" styleClass="btn-status-green" text="Završi" />
+                <Button onAction="#handleStatusCancel" styleClass="btn-status-red" text="Prekini" />
+                <Separator orientation="VERTICAL" />
+                <Button fx:id="btnDelete" onAction="#handleDeleteTura" styleClass="btn-delete" text="Obriši" />
+            </children>
+        </HBox>
+
+        <TableView fx:id="tableView" VBox.vgrow="ALWAYS">
+            <columns>
+                <TableColumn fx:id="brojCol" prefWidth="100.0" text="Broj Ture" />
+                <TableColumn fx:id="relacijaCol" prefWidth="250.0" text="Relacija (Od -> Do)" />
+                <TableColumn fx:id="datumCol" prefWidth="120.0" text="Datum Početka" />
+                <TableColumn fx:id="kmCol" prefWidth="100.0" text="KM" />
+                <TableColumn fx:id="statusCol" prefWidth="120.0" text="Status" />
+            </columns>
+            <columnResizePolicy>
+                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+            </columnResizePolicy>
+        </TableView>
+    </children>
+</VBox>

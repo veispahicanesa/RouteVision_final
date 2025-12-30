@@ -107,4 +107,9 @@ public class Vozac {
 
     public LocalDateTime getDatum_kreiranja() { return datum_kreiranja; }
     public void setDatum_kreiranja(LocalDateTime datum_kreiranja) { this.datum_kreiranja = datum_kreiranja; }
+
+    @Override
+    public String toString() {
+        return (ime != null ? ime : "") + " " + (prezime != null ? prezime : "");
+    }
 }

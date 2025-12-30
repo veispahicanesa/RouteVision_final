@@ -50,25 +50,34 @@ public class KamionDAO {
         }
         return kamioni;
     }
-    public void save(Kamion kamion) throws SQLException {
-        // ISPRAVLJENO: Koristi se 'zaduzeni_vozac_id' i broj parametara je usklađen (10 upitnika)
-        String query = "INSERT INTO kamion (registarska_tablica, marka, model, godina_proizvodnje, kapacitet_tone, stanje_kilometra, datum_registracije, datum_zakljucnog_pregleda, zaduzeni_vozac_id, aktivan) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        try (Connection conn = DatabaseConfig.getConnection();
+    public void save(Kamion k) throws SQLException {
+        // SQL upit uključuje sva polja koja si navela u INSERT naredbi
+        String query = "INSERT INTO kamion (registarska_tablica, marka, model, godina_proizvodnje, " +
+                "kapacitet_tone, stanje_kilometra, datum_registracije, aktivan, datum_kreiranja) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())";
+
+        try (Connection conn = unze.ptf.routevision_final.config.DatabaseConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setString(1, kamion.getRegistarska_tablica());
-            stmt.setString(2, kamion.getMarka());
-            stmt.setString(3, kamion.getModel());
-            stmt.setInt(4, kamion.getGodina_proizvodnje());
-            stmt.setDouble(5, kamion.getKapacitet_tone());
-            stmt.setInt(6, kamion.getStanje_kilometra());
-            stmt.setDate(7, kamion.getDatum_registracije() != null ? Date.valueOf(kamion.getDatum_registracije()) : null);
-            stmt.setDate(8, kamion.getDatum_zakljucnog_pregleda() != null ? Date.valueOf(kamion.getDatum_zakljucnog_pregleda()) : null);
-            stmt.setObject(9, kamion.getZaduzeni_vozac_id());
-            stmt.setBoolean(10, true);
+
+            stmt.setString(1, k.getRegistarska_tablica());
+            stmt.setString(2, k.getMarka());
+            stmt.setString(3, k.getModel());
+            stmt.setInt(4, k.getGodina_proizvodnje());
+            stmt.setDouble(5, k.getKapacitet_tone());
+            stmt.setInt(6, k.getStanje_kilometra());
+
+            // Rukovanje datumom (pretvaranje LocalDate u SQL Date)
+            if (k.getDatum_registracije() != null) {
+                stmt.setDate(7, java.sql.Date.valueOf(k.getDatum_registracije()));
+            } else {
+                stmt.setNull(7, java.sql.Types.DATE);
+            }
+
+            stmt.setBoolean(8, true); // Aktivan po defaultu
+
             stmt.executeUpdate();
         }
     }
-
     public void update(Kamion kamion) throws SQLException {
         // ISPRAVLJENO: Promijenjeno 'vozac_id' u 'zaduzeni_vozac_id' u UPDATE upitu
         String query = "UPDATE kamion SET marka = ?, model = ?, registarska_tablica = ?, godina_proizvodnje = ?, kapacitet_tone = ?, stanje_kilometra = ?, zaduzeni_vozac_id = ? WHERE id = ?";
@@ -104,7 +113,9 @@ public class KamionDAO {
         k.setGodina_proizvodnje(rs.getInt("godina_proizvodnje"));
         k.setKapacitet_tone(rs.getDouble("kapacitet_tone"));
         k.setStanje_kilometra(rs.getInt("stanje_kilometra"));
-
+        k.setDatum_registracije(rs.getDate("datum_registracije") != null ? rs.getDate("datum_registracije").toLocalDate() : null);
+        k.setIme_vozaca(rs.getString("ime_vozaca"));
+        k.setPrezime_vozaca(rs.getString("prezime_vozaca"));
         if (rs.getDate("datum_registracije") != null) {
             k.setDatum_registracije(rs.getDate("datum_registracije").toLocalDate());
         }

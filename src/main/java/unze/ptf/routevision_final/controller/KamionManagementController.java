@@ -32,14 +32,16 @@ public class KamionManagementController {
     @FXML private Button btnEdit;   // Opcionalno, ako želite i njega sakriti
 
     private KamionDAO kamionDAO = new KamionDAO();
-    private ObservableList<Kamion> kamionList;
+    private ObservableList<Kamion> kamionList = FXCollections.observableArrayList();
 
     @FXML
     public void initialize() {
         setupTableColumns();
+        tableView.setItems(kamionList);
         loadKamionData();
     }
-    @FXML private void handleRefresh(ActionEvent event) {
+    @FXML
+    private void handleRefresh(ActionEvent event) {
         loadKamionData();
     }
     private void setupTableColumns() {
@@ -54,22 +56,33 @@ public class KamionManagementController {
         try {
             String role = SessionManager.getInstance().getUserRole();
             int userId = SessionManager.getInstance().getUserId();
+            List<Kamion> podaci;
 
-            if ("VOZAC".equals(role)) {
-                // Pronađi kamion koji je povezan sa ovim vozačem u tabeli 'vozac'
-                // Upit u bazi: SELECT k.* FROM kamion k JOIN vozac v ON v.kamion_id = k.id WHERE v.id = ?
-                List<Kamion> mojKamion = kamionDAO.findByVozacId(userId);
-                tableView.setItems(FXCollections.observableArrayList(mojKamion));
+            // Koristimo equalsIgnoreCase ili usklađujemo sa ostatkom aplikacije ("Vozač")
+            if ("Vozač".equalsIgnoreCase(role) || "VOZAC".equalsIgnoreCase(role)) {
+                podaci = kamionDAO.findByVozacId(userId);
 
-                // Sakrij dugmiće za dodavanje i brisanje ako je vozač (on smije samo gledati/osvježiti)
-                btnAdd.setVisible(false);
-                btnDelete.setVisible(false);
+                // Sakrij kontrole koje vozač ne smije dirati
+                if (btnAdd != null) btnAdd.setVisible(false);
+                if (btnDelete != null) btnDelete.setVisible(false);
+                // Obično sakrijemo i Edit dugme za vozača na listi kamiona
+                if (btnEdit != null) btnEdit.setVisible(false);
             } else {
                 // Admin vidi sve
-                tableView.setItems(FXCollections.observableArrayList(kamionDAO.findAll()));
+                podaci = kamionDAO.findAll();
             }
+
+            // 1. Postavi podatke u listu
+            kamionList.setAll(podaci);
+
+            // 2. KLJUČNO: Poveži listu sa tabelom ako to već nisi uradila u initialize
+            tableView.setItems(kamionList);
+
+            // 3. Osvježi prikaz
+            tableView.refresh();
+
         } catch (SQLException e) {
-            showAlert("Greška", e.getMessage());
+            showAlert("Greška", "Problem pri učitavanju: " + e.getMessage());
         }
     }
     @FXML
@@ -98,11 +111,9 @@ public class KamionManagementController {
             try {
                 Kamion novi = new Kamion(regField.getText(), markaField.getText(), modelField.getText());
                 novi.setStanje_kilometra(Integer.parseInt(kmField.getText()));
-                novi.setAktivan(true);
 
-                // Ako dodaje vozač, kamion je odmah njegov
                 if ("VOZAC".equals(SessionManager.getInstance().getUserRole())) {
-                    novi.setVozac_id(SessionManager.getInstance().getUserId());
+                    novi.setZaduzeni_vozac_id(SessionManager.getInstance().getUserId());
                 }
 
                 kamionDAO.save(novi);
@@ -112,28 +123,67 @@ public class KamionManagementController {
             }
         }
     }
-
     @FXML
     private void handleEditKamion(ActionEvent event) {
+        // 1. Provjera selekcije
         Kamion selected = tableView.getSelectionModel().getSelectedItem();
         if (selected == null) {
-            showAlert("Upozorenje", "Odaberite kamion za izmjenu.");
+            showAlert("Upozorenje", "Molimo odaberite kamion iz tabele koji želite urediti!");
             return;
         }
 
-        TextInputDialog dialog = new TextInputDialog(String.valueOf(selected.getStanje_kilometra()));
-        dialog.setTitle("Ažuriraj Kilometražu");
-        dialog.setHeaderText("Kamion: " + selected.getRegistarska_tablica());
-        dialog.setContentText("Novo stanje kilometara:");
+        // 2. Kreiranje dijaloga
+        Dialog<ButtonType> dialog = new Dialog<>();
+        dialog.setTitle("Uredi Kamion: " + selected.getRegistarska_tablica());
 
-        Optional<String> result = dialog.showAndWait();
-        result.ifPresent(km -> {
-            try {
-                selected.setStanje_kilometra(Integer.parseInt(km));
-                kamionDAO.update(selected);
-                loadKamionData();
-            } catch (Exception e) {
-                showAlert("Greška", "Unesite ispravan broj.");
+        GridPane grid = new GridPane();
+        grid.setHgap(10); grid.setVgap(10); grid.setPadding(new Insets(20));
+
+        // 3. Polja za unos sa trenutnim podacima
+        TextField markaField = new TextField(selected.getMarka());
+        TextField modelField = new TextField(selected.getModel());
+        TextField regField = new TextField(selected.getRegistarska_tablica());
+        TextField kmField = new TextField(String.valueOf(selected.getStanje_kilometra()));
+        TextField nosivostField = new TextField(String.valueOf(selected.getKapacitet_tone()));
+
+        // Dodajemo i DatePicker za datume (ako ih imaš u modelu)
+        DatePicker regDate = new DatePicker(selected.getDatum_registracije());
+
+        grid.add(new Label("Marka:"), 0, 0); grid.add(markaField, 1, 0);
+        grid.add(new Label("Model:"), 0, 1); grid.add(modelField, 1, 1);
+        grid.add(new Label("Registracija:"), 0, 2); grid.add(regField, 1, 2);
+        grid.add(new Label("Kilometraža:"), 0, 3); grid.add(kmField, 1, 3);
+        grid.add(new Label("Nosivost (t):"), 0, 4); grid.add(nosivostField, 1, 4);
+        grid.add(new Label("Datum Reg:"), 0, 5); grid.add(regDate, 1, 5);
+
+        dialog.getDialogPane().setContent(grid);
+        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+
+        // 4. Obrada nakon klika na OK
+        dialog.showAndWait().ifPresent(result -> {
+            if (result == ButtonType.OK) {
+                try {
+                    // Ažuriranje objekta
+                    selected.setMarka(markaField.getText());
+                    selected.setModel(modelField.getText());
+                    selected.setRegistarska_tablica(regField.getText());
+                    selected.setStanje_kilometra(Integer.parseInt(kmField.getText()));
+                    selected.setKapacitet_tone(Double.parseDouble(nosivostField.getText()));
+                    selected.setDatum_registracije(regDate.getValue());
+
+                    // 5. Spasi u bazu
+                    kamionDAO.update(selected);
+
+                    // 6. OSVJEŽI DISPLEJ ODMAH
+                    loadKamionData();
+                    tableView.refresh();
+
+                    showAlert("Uspjeh", "Podaci o kamionu su ažurirani.");
+                } catch (NumberFormatException e) {
+                    showAlert("Greška", "Kilometri i nosivost moraju biti brojevi!");
+                } catch (SQLException e) {
+                    showAlert("Greška", "Baza podataka: " + e.getMessage());
+                }
             }
         });
     }

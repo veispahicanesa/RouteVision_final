@@ -17,9 +17,12 @@
 
         <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="button-box">
             <children>
-                <Button mnemonicParsing="false" onAction="#handleAddKamion" styleClass="btn-add" text="Dodaj Kamion" />
-                <Button mnemonicParsing="false" onAction="#handleEditKamion" styleClass="btn-edit" text="Uredi" />
-                <Button mnemonicParsing="false" onAction="#handleDeleteKamion" styleClass="btn-delete" text="Obriši" />
+                <Button fx:id="btnAdd" mnemonicParsing="false" onAction="#handleAddKamion" styleClass="btn-add" text="Dodaj Kamion" />
+
+                <Button fx:id="btnEdit" mnemonicParsing="false" onAction="#handleEditKamion" styleClass="btn-edit" text="Uredi" />
+
+                <Button fx:id="btnDelete" mnemonicParsing="false" onAction="#handleDeleteKamion" styleClass="btn-delete" text="Obriši" />
+
                 <Button mnemonicParsing="false" onAction="#handleRefresh" styleClass="btn-refresh" text="Osvježi" />
             </children>
         </HBox>

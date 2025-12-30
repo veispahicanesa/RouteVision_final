@@ -44,8 +44,8 @@ public class Vozac {
         this.tip_goriva = tip_goriva;
         this.kategorija_dozvole = kategorija_dozvole;
         this.datum_zaposlenja =LocalDate.now();
-        this.plata = 0.0;
-        this.broj_dovrsenih_tura = broj_dovrsenih_tura;
+        this.datum_zaposlenja = datum_zaposlenja; // Koristi parametar, ne LocalDate.now()
+        this.plata = plata;
         this.aktivan = true;
         this.kamionId = kamionId;
         this.opremaId = opremaId;

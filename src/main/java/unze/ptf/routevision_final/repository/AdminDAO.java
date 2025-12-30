@@ -92,7 +92,7 @@ public class AdminDAO {
     //dodala Anesa
 
     public void update(Admin admin) throws SQLException {
-        String query = "UPDATE admin SET ime = ?, prezime = ?, broj_telefona = ? WHERE id = ?";
+        String query = "UPDATE admin SET ime = ?, prezime = ?, broj_telefona = ?,email = ? WHERE id = ?";
 
         try (Connection conn = DatabaseConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
@@ -100,7 +100,8 @@ public class AdminDAO {
             stmt.setString(1, admin.getIme());
             stmt.setString(2, admin.getPrezime());
             stmt.setString(3, admin.getBroj_telefona());
-            stmt.setInt(4, admin.getId());
+            stmt.setString(4, admin.getEmail());
+            stmt.setInt(5, admin.getId());
 
             stmt.executeUpdate();
         }

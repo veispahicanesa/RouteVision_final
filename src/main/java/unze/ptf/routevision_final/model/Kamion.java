@@ -1,9 +1,8 @@
 package unze.ptf.routevision_final.model;
 
-
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+
 /*
  * Model klasa Kamion predstavlja vozilo (kamion) u sistemu.
  * Koristi se za evidenciju kamiona, tehničkih podataka,
@@ -16,25 +15,29 @@ public class Kamion {
     private String model;
     private int godina_proizvodnje;
     private double kapacitet_tone;
-    private String vrsta_voza;
     private int stanje_kilometra;
     private LocalDate datum_registracije;
     private LocalDate datum_zakljucnog_pregleda;
-    private Integer vozac_id;
-    private String aktivna_slika;
+    private String ime_vozaca;
+    private String prezime_vozaca;
+    private Integer zaduzeni_vozac_id;
     private boolean aktivan;
     private LocalDateTime datum_kreiranja;
 
+    // Prazan konstruktor
     public Kamion() {}
 
+    // Konstruktor sa osnovnim parametrima
     public Kamion(String registarska_tablica, String marka, String model) {
         this.registarska_tablica = registarska_tablica;
         this.marka = marka;
         this.model = model;
         this.aktivan = true;
+        this.datum_kreiranja = LocalDateTime.now();
+        this.godina_proizvodnje = LocalDate.now().getYear(); // Postavlja trenutnu godinu kao default
     }
 
-
+    // GETERI I SETERI
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
 
@@ -53,9 +56,6 @@ public class Kamion {
     public double getKapacitet_tone() { return kapacitet_tone; }
     public void setKapacitet_tone(double kapacitet_tone) { this.kapacitet_tone = kapacitet_tone; }
 
-    public String getVrsta_voza() { return vrsta_voza; }
-    public void setVrsta_voza(String vrsta_voza) { this.vrsta_voza = vrsta_voza; }
-
     public int getStanje_kilometra() { return stanje_kilometra; }
     public void setStanje_kilometra(int stanje_kilometra) { this.stanje_kilometra = stanje_kilometra; }
 
@@ -65,15 +65,24 @@ public class Kamion {
     public LocalDate getDatum_zakljucnog_pregleda() { return datum_zakljucnog_pregleda; }
     public void setDatum_zakljucnog_pregleda(LocalDate datum_zakljucnog_pregleda) { this.datum_zakljucnog_pregleda = datum_zakljucnog_pregleda; }
 
-    public Integer getVozac_id() { return vozac_id; }
-    public void setVozac_id(Integer vozac_id) { this.vozac_id = vozac_id; }
+    public String getIme_vozaca() { return ime_vozaca; }
+    public void setIme_vozaca(String ime_vozaca) { this.ime_vozaca = ime_vozaca; }
 
-    public String getAktivna_slika() { return aktivna_slika; }
-    public void setAktivna_slika(String aktivna_slika) { this.aktivna_slika = aktivna_slika; }
+    public String getPrezime_vozaca() { return prezime_vozaca; }
+    public void setPrezime_vozaca(String prezime_vozaca) { this.prezime_vozaca = prezime_vozaca; }
+
+    public Integer getZaduzeni_vozac_id() { return zaduzeni_vozac_id; }
+    public void setZaduzeni_vozac_id(Integer zaduzeni_vozac_id) { this.zaduzeni_vozac_id = zaduzeni_vozac_id; }
 
     public boolean isAktivan() { return aktivan; }
     public void setAktivan(boolean aktivan) { this.aktivan = aktivan; }
 
     public LocalDateTime getDatum_kreiranja() { return datum_kreiranja; }
     public void setDatum_kreiranja(LocalDateTime datum_kreiranja) { this.datum_kreiranja = datum_kreiranja; }
+
+    // Overridovan toString radi lakšeg prikaza u ComboBoxu
+    @Override
+    public String toString() {
+        return marka + " " + model + " (" + registarska_tablica + ")";
+    }
 }

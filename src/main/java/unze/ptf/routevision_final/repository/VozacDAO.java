@@ -87,19 +87,32 @@ public class VozacDAO {
         }
     }
 
-    public void update(Vozac vozac) throws SQLException {
-        String query = "UPDATE vozac SET ime = ?, prezime = ?, broj_telefona = ?, kategorija_dozvole = ? WHERE id = ?";
+    public void update(Vozac v) throws SQLException {
+        // SQL koji pokriva sve: od imena do plate i kamiona
+        String query = "UPDATE vozac SET ime=?, prezime=?, email=?, broj_telefona=?, " +
+                "broj_vozacke_dozvole=?, kategorija_dozvole=?, plata=?, kamion_id=?, " +
+                "marka_kamiona=?, broj_dovrsenih_tura=? WHERE id=?";
+
         try (Connection conn = DatabaseConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setString(1, vozac.getIme());
-            stmt.setString(2, vozac.getPrezime());
-            stmt.setString(3, vozac.getBroj_telefona());
-            stmt.setString(4, vozac.getKategorija_dozvole());
-            stmt.setInt(5, vozac.getId());
+            stmt.setString(1, v.getIme());
+            stmt.setString(2, v.getPrezime());
+            stmt.setString(3, v.getEmail());
+            stmt.setString(4, v.getBroj_telefona());
+            stmt.setString(5, v.getBroj_vozacke_dozvole());
+            stmt.setString(6, v.getKategorija_dozvole());
+            stmt.setDouble(7, v.getPlata());
+
+            if (v.getKamionId() != null) stmt.setInt(8, v.getKamionId());
+            else stmt.setNull(8, java.sql.Types.INTEGER);
+
+            stmt.setString(9, v.getMarka_kamiona());
+            stmt.setInt(10, v.getBroj_dovrsenih_tura());
+            stmt.setInt(11, v.getId());
+
             stmt.executeUpdate();
         }
     }
-
     public void delete(int id) throws SQLException {
         String query = "UPDATE vozac SET aktivan = FALSE WHERE id = ?";
         try (Connection conn = DatabaseConfig.getConnection();
@@ -138,5 +151,43 @@ public class VozacDAO {
             v.setDatum_kreiranja(rs.getTimestamp("datum_kreiranja").toLocalDateTime());
         }
         return v;
+    }
+    public void updatePassword(int id, String hashedLozinka) throws SQLException {
+        String query = "UPDATE vozac SET lozinka = ? WHERE id = ?";
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setString(1, hashedLozinka);
+            stmt.setInt(2, id);
+            stmt.executeUpdate();
+        }
+    }
+
+    // Popravljena update metoda koja čuva i podatke o kamionu
+    public void updateVozacComplete(Vozac v) throws SQLException {
+        String query = "UPDATE vozac SET ime=?, prezime=?, email=?, broj_telefona=?, " +
+                "broj_vozacke_dozvole=?, kategorija_dozvole=?, plata=?, kamion_id=?, " +
+                "marka_kamiona=?, trenutna_kilometraza=?, tip_goriva=?, broj_dovrsenih_tura=? WHERE id=?";
+
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setString(1, v.getIme());
+            stmt.setString(2, v.getPrezime());
+            stmt.setString(3, v.getEmail());
+            stmt.setString(4, v.getBroj_telefona());
+            stmt.setString(5, v.getBroj_vozacke_dozvole());
+            stmt.setString(6, v.getKategorija_dozvole());
+            stmt.setDouble(7, v.getPlata());
+
+            if (v.getKamionId() != null) stmt.setInt(8, v.getKamionId());
+            else stmt.setNull(8, java.sql.Types.INTEGER);
+
+            stmt.setString(9, v.getMarka_kamiona());
+            stmt.setInt(10, v.getTrenutna_kilometraza()); // DODANO
+            stmt.setString(11, v.getTip_goriva());       // DODANO
+            stmt.setInt(12, v.getBroj_dovrsenih_tura());
+            stmt.setInt(13, v.getId());
+
+            stmt.executeUpdate();
+        }
     }
 }

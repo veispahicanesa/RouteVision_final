@@ -187,20 +187,23 @@ public class ProfileController {
         initialize();
     }
 
-    // --- DIJALOZI ---
     private void showEditAdminDialog(Admin admin) {
         Dialog<ButtonType> dialog = new Dialog<>();
         dialog.setTitle("Uredi Profil");
+        dialog.setHeaderText("Izmjena osnovnih informacija administratora");
+
         GridPane grid = new GridPane();
         grid.setHgap(10); grid.setVgap(10); grid.setPadding(new Insets(20));
 
         TextField imeField = new TextField(admin.getIme());
         TextField prezimeField = new TextField(admin.getPrezime());
+        TextField emailField = new TextField(admin.getEmail());
         TextField telefonField = new TextField(admin.getBroj_telefona() != null ? admin.getBroj_telefona() : "");
 
         grid.add(new Label("Ime:"), 0, 0); grid.add(imeField, 1, 0);
         grid.add(new Label("Prezime:"), 0, 1); grid.add(prezimeField, 1, 1);
-        grid.add(new Label("Broj Telefona:"), 0, 2); grid.add(telefonField, 1, 2);
+        grid.add(new Label("Email:"), 0, 2); grid.add(emailField, 1, 2);
+        grid.add(new Label("Broj Telefona:"), 0, 3); grid.add(telefonField, 1, 3);
 
         dialog.getDialogPane().setContent(grid);
         dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
@@ -208,36 +211,97 @@ public class ProfileController {
         dialog.showAndWait().ifPresent(result -> {
             if (result == ButtonType.OK) {
                 try {
+                    // Postavljanje novih vrijednosti u objekt
                     admin.setIme(imeField.getText());
                     admin.setPrezime(prezimeField.getText());
+                    admin.setEmail(emailField.getText());
                     admin.setBroj_telefona(telefonField.getText());
-                    new AdminDAO().update(admin);
+
+                    // POZIV DAO - Mora biti jedan argument
+                    AdminDAO dao = new AdminDAO();
+                    dao.update(admin);
+
+                    // Osvježavanje sesije i ekrana
+                    sessionManager.setCurrentUser(admin, "Admin", admin.getId());
                     refreshView();
-                    showAlert("Uspjeh", "Podaci su ažurirani!");
+
+                    showAlert("Uspjeh", "Profil administratora je ažuriran!");
                 } catch (SQLException e) {
-                    showAlert("Greška", "Greška pri spremanju: " + e.getMessage());
+                    showAlert("Greška", "Baza podataka: " + e.getMessage());
+                }
+            }
+        });
+    }
+    private void showEditVozacDialog(Vozac vozac) {
+        Dialog<ButtonType> dialog = new Dialog<>();
+        dialog.setTitle("Uredi Profil");
+        dialog.setHeaderText("Izmjena ličnih podataka vozača");
+
+        GridPane grid = new GridPane();
+        grid.setHgap(10); grid.setVgap(10); grid.setPadding(new Insets(20));
+
+        // Polja popunjena trenutnim podacima iz baze (preko objekta vozac)
+        TextField imeField = new TextField(vozac.getIme());
+        TextField prezimeField = new TextField(vozac.getPrezime());
+        TextField emailField = new TextField(vozac.getEmail());
+        TextField telefonField = new TextField(vozac.getBroj_telefona() != null ? vozac.getBroj_telefona() : "");
+        TextField vozackaField = new TextField(vozac.getBroj_vozacke_dozvole());
+        TextField kategorijaField = new TextField(vozac.getKategorija_dozvole());
+
+        grid.add(new Label("Ime:"), 0, 0); grid.add(imeField, 1, 0);
+        grid.add(new Label("Prezime:"), 0, 1); grid.add(prezimeField, 1, 1);
+        grid.add(new Label("Email:"), 0, 2); grid.add(emailField, 1, 2);
+        grid.add(new Label("Telefon:"), 0, 3); grid.add(telefonField, 1, 3);
+        grid.add(new Label("Broj Dozvole:"), 0, 4); grid.add(vozackaField, 1, 4);
+        grid.add(new Label("Kategorija:"), 0, 5); grid.add(kategorijaField, 1, 5);
+
+        dialog.getDialogPane().setContent(grid);
+        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+
+        dialog.showAndWait().ifPresent(result -> {
+            if (result == ButtonType.OK) {
+                try {
+                    // 1. Ažuriranje objekta u memoriji
+                    vozac.setIme(imeField.getText());
+                    vozac.setPrezime(prezimeField.getText());
+                    vozac.setEmail(emailField.getText());
+                    vozac.setBroj_telefona(telefonField.getText());
+                    vozac.setBroj_vozacke_dozvole(vozackaField.getText());
+                    vozac.setKategorija_dozvole(kategorijaField.getText());
+
+                    // 2. Slanje promjena u bazu podataka
+                    VozacDAO dao = new VozacDAO();
+                    dao.update(vozac);
+
+                    // 3. OSVJEŽAVANJE SESIJE (Ovo je ono što ti je falilo da se odmah vidi)
+                    // Koristi ulogu "Vozač" (pazi na kvačicu č, mora biti isto kao pri prijavi)
+                    sessionManager.setCurrentUser(vozac, sessionManager.getUserRole(), vozac.getId());
+
+                    // 4. Ponovno iscrtavanje ekrana
+                    refreshView();
+
+                    showAlert("Uspjeh", "Vaš profil je uspješno ažuriran!");
+                } catch (SQLException e) {
+                    showAlert("Greška", "Baza podataka: " + e.getMessage());
                 }
             }
         });
     }
 
-    private void showEditVozacDialog(Vozac vozac) {
-        // Implementacija slična kao za admina...
-    }
-
     private void showChangePasswordDialog(int userId, String role) {
         Dialog<ButtonType> dialog = new Dialog<>();
         dialog.setTitle("Promjena Lozinke");
+
         GridPane grid = new GridPane();
         grid.setHgap(10); grid.setVgap(10); grid.setPadding(new Insets(20));
 
-        PasswordField currentPassField = new PasswordField();
-        PasswordField newPassField = new PasswordField();
-        PasswordField confirmPassField = new PasswordField();
+        PasswordField oldPass = new PasswordField();
+        PasswordField newPass = new PasswordField();
+        PasswordField confirmPass = new PasswordField();
 
-        grid.add(new Label("Trenutna Lozinka:"), 0, 0); grid.add(currentPassField, 1, 0);
-        grid.add(new Label("Nova Lozinka:"), 0, 1); grid.add(newPassField, 1, 1);
-        grid.add(new Label("Potvrdi Lozinku:"), 0, 2); grid.add(confirmPassField, 1, 2);
+        grid.add(new Label("Stara lozinka:"), 0, 0); grid.add(oldPass, 1, 0);
+        grid.add(new Label("Nova lozinka:"), 0, 1); grid.add(newPass, 1, 1);
+        grid.add(new Label("Potvrdi lozinku:"), 0, 2); grid.add(confirmPass, 1, 2);
 
         dialog.getDialogPane().setContent(grid);
         dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
@@ -245,21 +309,31 @@ public class ProfileController {
         dialog.showAndWait().ifPresent(result -> {
             if (result == ButtonType.OK) {
                 try {
-                    AdminDAO dao = new AdminDAO();
-                    Admin trenutni = dao.findById(userId);
-                    if (unze.ptf.routevision_final.service.SecurityService.verifyPassword(currentPassField.getText(), trenutni.getLozinka())) {
-                        if (newPassField.getText().equals(confirmPassField.getText()) && !newPassField.getText().isEmpty()) {
-                            String hashed = unze.ptf.routevision_final.service.SecurityService.hashPassword(newPassField.getText());
-                            dao.updatePassword(userId, hashed);
-                            showAlert("Uspjeh", "Lozinka promijenjena!");
+                    String currentHash = "";
+                    if ("Admin".equals(role)) {
+                        currentHash = new AdminDAO().findById(userId).getLozinka();
+                    } else {
+                        currentHash = new VozacDAO().findById(userId).getLozinka();
+                    }
+
+                    if (unze.ptf.routevision_final.service.SecurityService.verifyPassword(oldPass.getText(), currentHash)) {
+                        if (newPass.getText().equals(confirmPass.getText()) && !newPass.getText().isEmpty()) {
+                            String newHash = unze.ptf.routevision_final.service.SecurityService.hashPassword(newPass.getText());
+
+                            if ("Admin".equals(role)) {
+                                new AdminDAO().updatePassword(userId, newHash);
+                            } else {
+                                new VozacDAO().updatePassword(userId, newHash); // Sada imamo ovu metodu!
+                            }
+                            showAlert("Uspjeh", "Lozinka promijenjena.");
                         } else {
-                            showAlert("Greška", "Lozinke se ne podudaraju!");
+                            showAlert("Greška", "Lozinke se ne podudaraju.");
                         }
                     } else {
-                        showAlert("Greška", "Pogrešna trenutna lozinka!");
+                        showAlert("Greška", "Pogrešna stara lozinka.");
                     }
                 } catch (SQLException e) {
-                    showAlert("Greška", "Baza podataka: " + e.getMessage());
+                    showAlert("Greška", "Baza: " + e.getMessage());
                 }
             }
         });

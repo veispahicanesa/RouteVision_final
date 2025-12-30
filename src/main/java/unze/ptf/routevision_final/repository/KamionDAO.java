@@ -22,7 +22,10 @@ public class KamionDAO {
 
     public List<Kamion> findAll() throws SQLException {
         List<Kamion> kamioni = new ArrayList<>();
-        String query = "SELECT * FROM kamion WHERE aktivan = TRUE ORDER BY registarska_tablica";
+        String query = "SELECT k.*, v.ime AS ime_vozaca, v.prezime AS prezime_vozaca " +
+                "FROM kamion k " +
+                "LEFT JOIN vozac v ON k.zaduzeni_vozac_id = v.id " +
+                "WHERE k.aktivan = TRUE ORDER BY k.registarska_tablica";
         try (Connection conn = DatabaseConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
             ResultSet rs = stmt.executeQuery();
@@ -34,7 +37,11 @@ public class KamionDAO {
     public List<Kamion> findByVozacId(int vozacId) throws SQLException {
         List<Kamion> kamioni = new ArrayList<>();
         // SQL upit koji filtrira kamione prema ID-u vozača koji ga je zadužio
-        String query = "SELECT * FROM kamion WHERE zaduzeni_vozac_id = ? AND aktivan = TRUE";
+        String query = "SELECT k.*, v.ime AS ime_vozaca, v.prezime AS prezime_vozaca " +
+                "FROM kamion k " +
+                "LEFT JOIN vozac v ON k.zaduzeni_vozac_id = v.id " +
+                "WHERE k.zaduzeni_vozac_id = ? AND k.aktivan = TRUE";
+
 
         try (Connection conn = DatabaseConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
@@ -51,12 +58,11 @@ public class KamionDAO {
         return kamioni;
     }
     public void save(Kamion k) throws SQLException {
-        // SQL upit uključuje sva polja koja si navela u INSERT naredbi
         String query = "INSERT INTO kamion (registarska_tablica, marka, model, godina_proizvodnje, " +
-                "kapacitet_tone, stanje_kilometra, datum_registracije, aktivan, datum_kreiranja) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())";
+                "kapacitet_tone, stanje_kilometra, datum_registracije, zaduzeni_vozac_id, aktivan, datum_kreiranja) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())";
 
-        try (Connection conn = unze.ptf.routevision_final.config.DatabaseConfig.getConnection();
+        try (Connection conn = DatabaseConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
 
             stmt.setString(1, k.getRegistarska_tablica());
@@ -66,14 +72,18 @@ public class KamionDAO {
             stmt.setDouble(5, k.getKapacitet_tone());
             stmt.setInt(6, k.getStanje_kilometra());
 
-            // Rukovanje datumom (pretvaranje LocalDate u SQL Date)
+            // 7. Datum registracije
             if (k.getDatum_registracije() != null) {
                 stmt.setDate(7, java.sql.Date.valueOf(k.getDatum_registracije()));
             } else {
                 stmt.setNull(7, java.sql.Types.DATE);
             }
 
-            stmt.setBoolean(8, true); // Aktivan po defaultu
+            // 8. ID Vozača (setObject je sigurnije za null vrijednosti)
+            stmt.setObject(8, k.getZaduzeni_vozac_id());
+
+            // 9. Aktivan status
+            stmt.setBoolean(9, true);
 
             stmt.executeUpdate();
         }
@@ -113,24 +123,26 @@ public class KamionDAO {
         k.setGodina_proizvodnje(rs.getInt("godina_proizvodnje"));
         k.setKapacitet_tone(rs.getDouble("kapacitet_tone"));
         k.setStanje_kilometra(rs.getInt("stanje_kilometra"));
-        k.setDatum_registracije(rs.getDate("datum_registracije") != null ? rs.getDate("datum_registracije").toLocalDate() : null);
-        k.setIme_vozaca(rs.getString("ime_vozaca"));
-        k.setPrezime_vozaca(rs.getString("prezime_vozaca"));
-        if (rs.getDate("datum_registracije") != null) {
-            k.setDatum_registracije(rs.getDate("datum_registracije").toLocalDate());
-        }
-        if (rs.getDate("datum_zakljucnog_pregleda") != null) {
-            k.setDatum_zakljucnog_pregleda(rs.getDate("datum_zakljucnog_pregleda").toLocalDate());
+
+        // Datumi
+        Date regDate = rs.getDate("datum_registracije");
+        if (regDate != null) k.setDatum_registracije(regDate.toLocalDate());
+
+        Date pregledDate = rs.getDate("datum_zakljucnog_pregleda");
+        if (pregledDate != null) k.setDatum_zakljucnog_pregleda(pregledDate.toLocalDate());
+
+        // Vozač ID (sigurno rukovanje null vrijednošću)
+        int vId = rs.getInt("zaduzeni_vozac_id");
+        if (!rs.wasNull()) {
+            k.setZaduzeni_vozac_id(vId);
+        } else {
+            k.setZaduzeni_vozac_id(null);
         }
 
-        // Koristi se zaduzeni_vozac_id kao u tvojoj bazi
-        Object vId = rs.getObject("zaduzeni_vozac_id");
-        if (vId != null) {
-            k.setZaduzeni_vozac_id((Integer) vId);
-        }
+        // IME I PREZIME IZ JOIN-a (OVO JE KLJUČNO)
+        k.setIme_vozaca(rs.getString("ime_vozaca") != null ? rs.getString("ime_vozaca") : "");
+        k.setPrezime_vozaca(rs.getString("prezime_vozaca") != null ? rs.getString("prezime_vozaca") : "");
 
-        k.setIme_vozaca(rs.getString("ime_vozaca"));
-        k.setPrezime_vozaca(rs.getString("prezime_vozaca"));
         k.setAktivan(rs.getBoolean("aktivan"));
         return k;
     }

@@ -6,11 +6,16 @@ import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import unze.ptf.routevision_final.model.Admin;
+import unze.ptf.routevision_final.model.Tura;
 import unze.ptf.routevision_final.model.Vozac;
 import unze.ptf.routevision_final.repository.AdminDAO;
+import unze.ptf.routevision_final.repository.TuraDAO;
 import unze.ptf.routevision_final.repository.VozacDAO;
 import java.time.format.DateTimeFormatter;
 import java.sql.SQLException;
+import java.util.List;
+import java.util.ArrayList;
+import unze.ptf.routevision_final.model.Tura;
 
 public class ProfileController {
 
@@ -138,10 +143,45 @@ public class ProfileController {
     private VBox createRecentTripsSection(int vozacId) {
         VBox section = new VBox(8);
         section.getStyleClass().add("info-section");
-        section.getChildren().addAll(new Label("Zadnja 3 Putovanja"), new Label("Nema nedavnih putovanja."));
+
+        Label title = new Label("Zadnja 3 Putovanja");
+        title.getStyleClass().add("section-title"); // Ako imaš CSS za naslov
+        section.getChildren().add(title);
+
+        try {
+            // 1. Pozivamo DAO da dohvati ture za ovog vozača
+            TuraDAO turaDAO = new TuraDAO();
+            List<Tura> zadnjeTure = turaDAO.findByVozacId(vozacId);
+
+            if (zadnjeTure == null || zadnjeTure.isEmpty()) {
+                // Ako nema tura, prikaži poruku
+                section.getChildren().add(new Label("Nema nedavnih putovanja."));
+            } else {
+                // 2. Uzmi samo zadnje 3 (ili manje ako ih nema toliko)
+                int brojPrikaza = Math.min(zadnjeTure.size(), 3);
+
+                for (int i = 0; i < brojPrikaza; i++) {
+                    Tura t = zadnjeTure.get(i);
+
+                    // Kreiramo ljepši ispis za svaku turu
+                    String tekstTure = String.format("%s: %s → %s (%s)",
+                            t.getBroj_tura(),
+                            t.getLokacija_pocetka(),
+                            t.getLokacija_kraja(),
+                            t.getStatus());
+
+                    Label turaLabel = new Label(tekstTure);
+                    turaLabel.getStyleClass().add("trip-item-label"); // Opcionalno za CSS
+                    section.getChildren().add(turaLabel);
+                }
+            }
+        } catch (SQLException e) {
+            section.getChildren().add(new Label("Greška pri učitavanju putovanja."));
+            e.printStackTrace();
+        }
+
         return section;
     }
-
     private void refreshView() {
         mainContainer.getChildren().clear();
         initialize();

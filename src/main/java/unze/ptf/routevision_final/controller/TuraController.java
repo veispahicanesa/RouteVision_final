@@ -8,6 +8,8 @@ import javafx.scene.control.*;
 import unze.ptf.routevision_final.model.Tura;
 import unze.ptf.routevision_final.repository.TuraDAO;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 public class TuraController {
@@ -28,8 +30,11 @@ public class TuraController {
         loadData();
 
         // Sakrij brisanje ako nije admin
-        if (!"Admin".equals(SessionManager.getInstance().getUserRole())) {
-            btnDelete.setVisible(false);
+        if (SessionManager.getInstance() != null) {
+            String role = SessionManager.getInstance().getUserRole();
+            if (!"Admin".equals(role) && btnDelete != null) {
+                btnDelete.setVisible(false);
+            }
         }
     }
 
@@ -47,22 +52,17 @@ public class TuraController {
 
     private void loadData() {
         try {
+            if (SessionManager.getInstance() == null) return;
+
             String role = SessionManager.getInstance().getUserRole();
             int userId = SessionManager.getInstance().getUserId();
 
             List<Tura> listaTura;
-
             if ("Admin".equals(role)) {
-                // ADMIN vidi apsolutno sve ture svih vozača
                 listaTura = turaDAO.findAll();
-
-                // Opcionalno: Adminu omogućavamo brisanje, vozaču ne
                 if (btnDelete != null) btnDelete.setVisible(true);
             } else {
-                // VOZAČ vidi samo ture koje su dodijeljene njegovom ID-u
                 listaTura = turaDAO.findByVozacId(userId);
-
-                // Sakrivamo dugme za brisanje vozačima
                 if (btnDelete != null) btnDelete.setVisible(false);
             }
 
@@ -72,36 +72,35 @@ public class TuraController {
             showAlert("Greška", "Nije moguće učitati ture iz baze.");
             e.printStackTrace();
         }
-    }private void showAlert(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        // Ako je naslov "Greška", postavi ikonu na Error tip
-        if (title.equalsIgnoreCase("Greška")) {
-            alert.setAlertType(Alert.AlertType.ERROR);
-        }
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
     }
 
-    @FXML
-    private void handleStatusInProgress() { azurirajStatus("U toku"); }
-
-    @FXML
-    private void handleZavrsiTuru() { azurirajStatus("Završena"); }
-
-    @FXML
-    private void handleStatusCancel() { azurirajStatus("Prekinuta"); }
+    @FXML private void handleStatusInProgress() { azurirajStatus("U toku"); }
+    @FXML private void handleZavrsiTuru() { azurirajStatus("Završena"); }
+    @FXML private void handleStatusCancel() { azurirajStatus("Prekinuta"); }
 
     private void azurirajStatus(String noviStatus) {
         Tura sel = tableView.getSelectionModel().getSelectedItem();
-        if (sel == null) return;
+        if (sel == null) {
+            showAlert("Upozorenje", "Molimo odaberite turu iz tabele.");
+            return;
+        }
 
         try {
             sel.setStatus(noviStatus);
+
+            // AKO ZAVRŠAVAMO TURU: Postavi trenutni datum i vrijeme kraja
+            if ("Završena".equals(noviStatus)) {
+                sel.setDatum_kraja(LocalDate.now());
+                sel.setVrijeme_kraja(LocalTime.now());
+            }
+
             turaDAO.update(sel);
             loadData();
-        } catch (SQLException e) { e.printStackTrace(); }
+            showAlert("Uspjeh", "Status ture je promijenjen na: " + noviStatus);
+        } catch (SQLException e) {
+            showAlert("Greška", "Baza podataka nije prihvatila promjenu.");
+            e.printStackTrace();
+        }
     }
 
     @FXML
@@ -110,13 +109,27 @@ public class TuraController {
         if (sel == null) return;
 
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Obriši turu " + sel.getBroj_tura() + "?");
+        alert.setTitle("Potvrda brisanja");
+        alert.setHeaderText(null);
+
         alert.showAndWait().ifPresent(response -> {
             if (response == ButtonType.OK) {
                 try {
                     turaDAO.delete(sel.getId());
                     loadData();
-                } catch (SQLException e) { e.printStackTrace(); }
+                } catch (SQLException e) {
+                    showAlert("Greška", "Brisanje nije uspjelo.");
+                    e.printStackTrace();
+                }
             }
         });
+    }
+
+    private void showAlert(String title, String message) {
+        Alert alert = new Alert(title.equalsIgnoreCase("Greška") ? Alert.AlertType.ERROR : Alert.AlertType.INFORMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 }

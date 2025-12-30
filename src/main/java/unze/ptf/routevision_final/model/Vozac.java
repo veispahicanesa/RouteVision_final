@@ -1,11 +1,14 @@
 package unze.ptf.routevision_final.model;
 
+
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /*
  * Model klasa Vozac predstavlja jednog vozača u sistemu.
  * Čuva osnovne podatke o vozaču, kontakt, dozvolu, datum zaposlenja, plate i statistiku tura.
+ * Takođe prati status aktivnosti i datum kreiranja zapisa.
  */
 public class Vozac {
     private int id;
@@ -23,35 +26,13 @@ public class Vozac {
     private double plata;
     private int broj_dovrsenih_tura;
     private boolean aktivan;
-    private Integer kamionId;
-    private Integer opremaId;
+    private Integer kamionId; // Novo
+    private Integer opremaId; // Novo
     private LocalDateTime datum_kreiranja;
 
-    // 1. Prazan konstruktor (Neophodan za DAO mapiranje i settere)
     public Vozac() {}
 
-    // 2. Konstruktor sa 5 parametara (Ovaj rješava tvoju grešku "no suitable constructor")
-    public Vozac(String ime, String prezime, String email, String lozinka, String broj_vozacke_dozvole) {
-        this.ime = ime;
-        this.prezime = prezime;
-        this.email = email;
-        this.lozinka = lozinka;
-        this.broj_vozacke_dozvole = broj_vozacke_dozvole;
-
-        // Postavljanje podrazumijevanih vrijednosti
-        this.aktivan = true;
-        this.datum_zaposlenja = LocalDate.now();
-        this.datum_kreiranja = LocalDateTime.now();
-        this.plata = 0.0;
-        this.broj_dovrsenih_tura = 0;
-    }
-
-    // 3. Veliki konstruktor (Ispravljen da koristi sve parametre)
-    public Vozac(String ime, String prezime, String email, String lozinka, String broj_telefona,
-                 String marka_kamiona, int trenutna_kilometraza, String broj_vozacke_dozvole,
-                 String tip_goriva, String kategorija_dozvole, LocalDate datum_zaposlenja,
-                 double plata, int broj_dovrsenih_tura, boolean aktivan,
-                 Integer kamionId, Integer opremaId, LocalDateTime datum_kreiranja) {
+    public Vozac(String ime, String prezime, String email, String lozinka,String broj_telefona,String marka_kamiona,int trenutna_kilometraza,String broj_vozacke_dozvole,String tip_goriva,String kategorija_dozvole,LocalDate datum_zaposlenja,double plata,int broj_dovrsenih_tura,boolean aktivan,Integer kamionId,Integer opremaId,LocalDateTime datum_kreiranja) {
         this.ime = ime;
         this.prezime = prezime;
         this.email = email;
@@ -62,16 +43,15 @@ public class Vozac {
         this.broj_vozacke_dozvole = broj_vozacke_dozvole;
         this.tip_goriva = tip_goriva;
         this.kategorija_dozvole = kategorija_dozvole;
-        this.datum_zaposlenja = datum_zaposlenja;
-        this.plata = plata;
+        this.datum_zaposlenja =LocalDate.now();
+        this.plata = 0.0;
         this.broj_dovrsenih_tura = broj_dovrsenih_tura;
-        this.aktivan = aktivan;
+        this.aktivan = true;
         this.kamionId = kamionId;
         this.opremaId = opremaId;
-        this.datum_kreiranja = datum_kreiranja;
+        this.datum_kreiranja = LocalDateTime.now();
     }
 
-    // --- Getteri i Setteri ---
 
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
@@ -114,6 +94,7 @@ public class Vozac {
 
     public int getBroj_dovrsenih_tura() { return broj_dovrsenih_tura; }
     public void setBroj_dovrsenih_tura(int broj_dovrsenih_tura) { this.broj_dovrsenih_tura = broj_dovrsenih_tura; }
+
 
     public boolean isAktivan() { return aktivan; }
     public void setAktivan(boolean aktivan) { this.aktivan = aktivan; }

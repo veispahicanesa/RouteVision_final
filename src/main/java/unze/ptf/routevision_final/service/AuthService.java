@@ -37,7 +37,26 @@ public class AuthService {
     }
 
     public void registerVozac(String ime, String prezime, String email, String password, String broj_vozacke_dozvole) throws SQLException {
-        Vozac vozac = new Vozac(ime, prezime, email, SecurityService.hashPassword(password), broj_vozacke_dozvole);
+
+        Vozac vozac = new Vozac();
+
+
+        vozac.setIme(ime);
+        vozac.setPrezime(prezime);
+        vozac.setEmail(email);
+        vozac.setLozinka(SecurityService.hashPassword(password));
+        vozac.setBroj_vozacke_dozvole(broj_vozacke_dozvole);
+
+
+        vozac.setPlata(0.0);
+        vozac.setMarka_kamiona("N/A");
+        vozac.setTip_goriva("Dizel");
+        vozac.setKategorija_dozvole("B"); // ili neka druga početna kategorija
+        vozac.setAktivan(true);
+        vozac.setDatum_zaposlenja(java.time.LocalDate.now()); // Popravljeno: LocalDate.now()
+        vozac.setDatum_kreiranja(java.time.LocalDateTime.now());
+
+
         vozacDAO.save(vozac);
     }
 

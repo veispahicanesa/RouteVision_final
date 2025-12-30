@@ -50,6 +50,7 @@ public class DashboardController {
         if ("Admin".equals(userRole)) {
             sideMenu.getChildren().addAll(
                     createMenuBtn("Profil", e -> showProfile()),
+                    createMenuBtn("Administratori", e -> showAdmini()),
                     createMenuBtn("Vozači", e -> showVozaci()),
                     createMenuBtn("Kamioni", e -> showKamioni()),
                     createMenuBtn("Oprema", e -> showOprema()),
@@ -133,5 +134,8 @@ public class DashboardController {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+    private void showAdmini() {
+        loadView("admin-list.fxml");
     }
 }

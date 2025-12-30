@@ -10,9 +10,11 @@ public class Admin {
     private String lozinka;
     private String broj_telefona;
     private LocalDateTime datum_kreiranja;
+    private LocalDateTime datum_zaposlenja;
+    private double plata;
     private boolean aktivan;
 
-    public Admin() {}
+    public Admin(){}
 
     public Admin(String ime, String prezime, String email, String lozinka, String broj_telefona) {
         this.ime = ime;
@@ -20,8 +22,13 @@ public class Admin {
         this.email = email;
         this.lozinka = lozinka;
         this.broj_telefona = broj_telefona;
+
         this.aktivan = true;
+        this.datum_kreiranja = LocalDateTime.now();
+        this.datum_zaposlenja = LocalDateTime.now();
+        this.plata = 0.0;
     }
+
 
 
     public int getId() { return id; }
@@ -47,4 +54,10 @@ public class Admin {
 
     public boolean isAktivan() { return aktivan; }
     public void setAktivan(boolean aktivan) { this.aktivan = aktivan; }
+
+    public LocalDateTime getDatum_zaposlenja() { return datum_zaposlenja; }
+    public void setDatum_zaposlenja(LocalDateTime datum_zaposlenja) { this.datum_zaposlenja = datum_zaposlenja; }
+
+    public double getPlata() { return plata; }
+    public void setPlata(double plata) { this.plata = plata; }
 }

@@ -14,7 +14,7 @@ public class DatabaseConfig {
                     + "&verifyServerCertificate=false"; // ⚠️ ne provjerava certifikat, ali radi za demo
 
     private static final String USER = "avnadmin";
-    private static final String PASSWORD = "sifra";
+    private static final String PASSWORD = "";
 
     // Učitavanje MySQL JDBC drajvera
     static {

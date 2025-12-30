@@ -45,8 +45,8 @@ public class TuraDAO {
     // 3. Spremanje nove ture u bazu
     public void save(Tura tura) throws SQLException {
         String query = "INSERT INTO tura (broj_ture, vozac_id, kamion_id, narudzba_id, datum_pocetka, " +
-                "vrijeme_pocetka, lokacija_pocetka, lokacija_kraja, status, aktivan) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                "vrijeme_pocetka, lokacija_pocetka, lokacija_kraja, status, aktivan,kreirao_admin_id, kreirao_vozac_id, datum_kreiranja) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?, NOW())";
 
         try (Connection conn = DatabaseConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
@@ -54,13 +54,15 @@ public class TuraDAO {
             stmt.setString(1, tura.getBroj_tura());
             stmt.setInt(2, tura.getVozac_id());
             stmt.setInt(3, tura.getKamion_id());
-            stmt.setInt(4, tura.getNarudba_id()); // Provjeri u modelu da li je getter setNarudba ili setNarudzba
-            stmt.setDate(5, tura.getDatum_pocetka() != null ? Date.valueOf(tura.getDatum_pocetka()) : null);
-            stmt.setTime(6, tura.getVrijeme_pocetka() != null ? Time.valueOf(tura.getVrijeme_pocetka()) : null);
+            stmt.setInt(4, tura.getNarudzba_id());
+            stmt.setDate(5, tura.getDatum_pocetka() != null ? Date.valueOf(tura.getDatum_pocetka()) : Date.valueOf(java.time.LocalDate.now()));
+            stmt.setTime(6, tura.getVrijeme_pocetka() != null ? Time.valueOf(tura.getVrijeme_pocetka()) : Time.valueOf(java.time.LocalTime.now()));
             stmt.setString(7, tura.getLokacija_pocetka());
             stmt.setString(8, tura.getLokacija_kraja());
             stmt.setString(9, tura.getStatus() != null ? tura.getStatus() : "U toku");
             stmt.setBoolean(10, true);
+            stmt.setString(11, tura.getKreirao_admin_id());
+            stmt.setString(12, tura.getKreirao_vozac_id());
 
             stmt.executeUpdate();
         }
@@ -68,16 +70,18 @@ public class TuraDAO {
 
     // 4. Ažuriranje postojeće ture (Promjena statusa i KM)
     public void update(Tura tura) throws SQLException {
-        String query = "UPDATE tura SET status = ?, prijedeni_kilometri = ?, datum_kraja = ?, vrijeme_kraja = ? WHERE id = ?";
+        String query = "UPDATE tura SET status = ?, prijedeni_kilometri = ?, datum_kraja = ?, vrijeme_kraja = ? spent_fuel = ?, fuel_used = ? WHERE id = ?";
 
         try (Connection conn = DatabaseConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
 
             stmt.setString(1, tura.getStatus());
             stmt.setInt(2, tura.getPrijedeni_kilometri());
-            stmt.setDate(3, tura.getDatum_kraja() != null ? Date.valueOf(tura.getDatum_kraja()) : null);
-            stmt.setTime(4, tura.getVrijeme_kraja() != null ? Time.valueOf(tura.getVrijeme_kraja()) : null);
-            stmt.setInt(5, tura.getId());
+            stmt.setDate(3, tura.getDatum_kraja() != null ? Date.valueOf(tura.getDatum_kraja()) : Date.valueOf(java.time.LocalDate.now()));
+            stmt.setTime(4, tura.getVrijeme_kraja() != null ? Time.valueOf(tura.getVrijeme_kraja()) : Time.valueOf(java.time.LocalTime.now()));
+            stmt.setDouble(5, tura.getSpent_fuel());
+            stmt.setDouble(6, tura.getFuel_used());
+            stmt.setInt(7, tura.getId());
 
             stmt.executeUpdate();
         }
@@ -105,7 +109,7 @@ public class TuraDAO {
         t.setKamion_id(rs.getInt("kamion_id"));
 
         // ISPRAVLJENO: Koristimo 'narudzba_id' sa 'z' jer je tako u SQL skripti
-        t.setNarudba_id(rs.getInt("narudzba_id"));
+        t.setNarudzba_id(rs.getInt("narudzba_id"));
 
         t.setDatum_pocetka(rs.getDate("datum_pocetka") != null ? rs.getDate("datum_pocetka").toLocalDate() : null);
         t.setVrijeme_pocetka(rs.getTime("vrijeme_pocetka") != null ? rs.getTime("vrijeme_pocetka").toLocalTime() : null);
@@ -116,8 +120,12 @@ public class TuraDAO {
         t.setLokacija_pocetka(rs.getString("lokacija_pocetka"));
         t.setLokacija_kraja(rs.getString("lokacija_kraja"));
         t.setPrijedeni_kilometri(rs.getInt("prijedeni_kilometri"));
+        t.setSpent_fuel(rs.getDouble("spent_fuel"));
+        t.setFuel_used(rs.getDouble("fuel_used"));
         t.setStatus(rs.getString("status"));
         t.setAktivan(rs.getBoolean("aktivan"));
+        t.setKreirao_admin_id(rs.getString("kreirao_admin_id"));
+        t.setKreirao_vozac_id(rs.getString("kreirao_vozac_id"));
 
         return t;
     }

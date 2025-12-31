@@ -26,11 +26,15 @@
 
         <TableView fx:id="tableView" VBox.vgrow="ALWAYS">
             <columns>
-                <TableColumn fx:id="idCol" prefWidth="50.0" text="ID" />
-                <TableColumn fx:id="datumCol" prefWidth="120.0" text="Datum Servisa" />
-                <TableColumn fx:id="vrstaCol" prefWidth="130.0" text="Vrsta Servisa" />
+                <TableColumn fx:id="idCol" prefWidth="40.0" text="#" />
+                <TableColumn fx:id="kamionCol" prefWidth="80.0" text="Kamion ID" />
+                <TableColumn fx:id="vozacCol" prefWidth="80.0" text="Vozač ID" />
+                <TableColumn fx:id="datumCol" prefWidth="100.0" text="Datum" />
+                <TableColumn fx:id="vrstaCol" prefWidth="120.0" text="Vrsta Servisa" />
+                <TableColumn fx:id="kmCol" prefWidth="90.0" text="KM" />
                 <TableColumn fx:id="trosciCol" prefWidth="100.0" text="Trošak" />
-                <TableColumn fx:id="servisarCol" prefWidth="130.0" text="Serviser" />
+                <TableColumn fx:id="servisarCol" prefWidth="120.0" text="Serviser" />
+                <TableColumn fx:id="korisnikCol" prefWidth="100.0" text="Zabilježio" />
             </columns>
         </TableView>
     </children>

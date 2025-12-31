@@ -23,22 +23,22 @@ public class KamionDAO {
     }
 
     public List<Kamion> findByVozacId(int vozacId) throws SQLException {
-        List<Kamion> kamioni = new ArrayList<>();
-        // SQL upit je sada jednostavniji: tražimo samo u tabeli kamion
+        List<Kamion> lista = new ArrayList<>();
+        // Mora biti zaduzeni_vozac_id prema tvojoj SQL šemi
         String query = "SELECT * FROM kamion WHERE zaduzeni_vozac_id = ? AND aktivan = TRUE";
 
         try (Connection conn = DatabaseConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
-
             stmt.setInt(1, vozacId);
             ResultSet rs = stmt.executeQuery();
-
             while (rs.next()) {
-                // Koristimo isti mapResultSetToKamion koji je sada očišćen
-                kamioni.add(mapResultSetToKamion(rs));
+                Kamion k = new Kamion();
+                k.setId(rs.getInt("id"));
+                k.setRegistarska_tablica(rs.getString("registarska_tablica"));
+                lista.add(k);
             }
         }
-        return kamioni;
+        return lista;
     }
     public void save(Kamion k) throws SQLException {
         String query = "INSERT INTO kamion (registarska_tablica, marka, model, godina_proizvodnje, " +

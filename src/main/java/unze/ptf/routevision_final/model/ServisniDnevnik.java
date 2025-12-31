@@ -22,6 +22,10 @@ public class ServisniDnevnik {
     private String datoteka_path;
     private boolean aktivan;
     private LocalDateTime datum_kreiranja;
+    private String kreirao_korisnik;
+    private Integer nadlezni_admin_id;
+    private String registracijaKamiona;
+    private String imeVozaca;
 
     public ServisniDnevnik() {}
 
@@ -70,4 +74,26 @@ public class ServisniDnevnik {
 
     public LocalDateTime getDatum_kreiranja() { return datum_kreiranja; }
     public void setDatum_kreiranja(LocalDateTime datum_kreiranja) { this.datum_kreiranja = datum_kreiranja; }
+
+    public String getKreirao_korisnik() {
+        return kreirao_korisnik;
+    }
+
+    public void setKreirao_korisnik(String kreirao_korisnik) {
+        this.kreirao_korisnik = kreirao_korisnik;
+    }
+
+    public Integer getNadlezni_admin_id() {
+        return nadlezni_admin_id;
+    }
+
+    public void setNadlezni_admin_id(Integer nadlezni_admin_id) {
+        this.nadlezni_admin_id = nadlezni_admin_id;
+    }
+
+
+    public String getRegistracijaKamiona() { return registracijaKamiona; }
+    public void setRegistracijaKamiona(String registracijaKamiona) { this.registracijaKamiona = registracijaKamiona; }
+    public String getImeVozaca() { return imeVozaca; }
+    public void setImeVozaca(String imeVozaca) { this.imeVozaca = imeVozaca; }
 }

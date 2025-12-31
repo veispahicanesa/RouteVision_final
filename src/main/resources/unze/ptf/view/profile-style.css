@@ -1,49 +1,96 @@
+/* GLAVNA POZADINA */
+.root {
+    -fx-background-color: #0F172A;
+}
+
+#mainContainer {
+    -fx-background-color: #0F172A;
+}
+
+/* NASLOV - Steel Blue (ozbiljna plava, nije drečava) */
 .title-label {
-    -fx-font-size: 20px;
-    -fx-font-weight: bold;
-    -fx-text-fill: #1e88e5;
+    -fx-font-family: "Segoe UI Black";
+    -fx-font-size: 32px;
+    -fx-text-fill: #94A3B8;
+    -fx-padding: 0 0 15 0;
+    -fx-border-color: transparent transparent #F59E0B transparent;
+    -fx-border-width: 0 0 2 0; /* Zlatna linija ispod naslova */
 }
 
+/* KARTICA SA PODACIMA */
 .info-section {
-    -fx-border-color: #e0e0e0;
+    -fx-background-color: #1E293B;
+    -fx-background-radius: 10;
+    -fx-padding: 30;
+    -fx-border-color: rgba(255, 255, 255, 0.1);
     -fx-border-width: 1;
-    -fx-padding: 15;
-    -fx-background-color: #f9f9f9;
 }
 
+/* TEKST UNUTAR KARTICE */
 .section-title {
+    -fx-font-family: "Segoe UI Bold";
     -fx-font-size: 14px;
-    -fx-font-weight: bold;
-    -fx-text-fill: #263238;
+    -fx-text-fill: #F59E0B;
+    -fx-text-transform: uppercase;
+    -fx-padding: 0 0 10 0;
 }
 
 .key-label {
-    -fx-font-weight: bold;
-    -fx-text-fill: #555555;
+    -fx-font-family: "Segoe UI Semibold";
+    -fx-font-size: 13px;
+    -fx-text-fill: #64748B;
 }
 
 .value-label {
-    -fx-text-fill: #333333;
+    -fx-font-family: "Segoe UI Bold";
+    -fx-font-size: 16px;
+    -fx-text-fill: white;
 }
 
+/* --- DUGMAD (IDENTIČAN STIL ZA OBA) --- */
+.btn-edit, .btn-password {
+    -fx-font-family: "Segoe UI Bold";
+    -fx-font-size: 14px;
+    -fx-padding: 12 30;
+    -fx-background-radius: 5; /* Oba su sada blago zaobljena, identično */
+    -fx-border-radius: 5;
+    -fx-cursor: hand;
+    -fx-min-width: 180px; /* Da budu iste širine */
+}
+
+/* Glavno dugme (Zlatno) */
 .btn-edit {
-    -fx-background-color: #1e88e5;
-    -fx-text-fill: white;
-    -fx-padding: 10 20;
-    -fx-font-size: 12px;
+    -fx-background-color: #F59E0B;
+    -fx-text-fill: #0F172A;
 }
 
+.btn-edit:hover {
+    -fx-background-color: #D97706;
+}
+
+/* Sporedno dugme (Transparentno sa bijelim rubom) */
 .btn-password {
-    -fx-background-color: #ff6f00;
+    -fx-background-color: transparent;
     -fx-text-fill: white;
-    -fx-padding: 10 20;
-    -fx-font-size: 12px;
+    -fx-border-color: white;
+    -fx-border-width: 2;
 }
 
-.error-label {
-    -fx-text-fill: #d32f2f;
+.btn-password:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.1);
 }
 
-.placeholder-label {
-    -fx-text-fill: #999999;
+/* --- SKROL TRAKA --- */
+.scroll-pane {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+}
+
+.scroll-pane .thumb {
+    -fx-background-color: #475569; /* Tamno siva traka da ne bode oči */
+    -fx-background-radius: 10;
+}
+
+.scroll-pane .track {
+    -fx-background-color: transparent;
 }

@@ -13,7 +13,7 @@
     <top>
         <HBox alignment="CENTER_LEFT" prefHeight="60.0" styleClass="header-bar" BorderPane.alignment="CENTER">
             <children>
-                <Label text="RouteVision PRO" textFill="WHITE">
+                <Label text="HN Logistics" styleClass="brand-name-top">
                     <font>
                         <Font name="System Bold" size="20.0" />
                     </font>

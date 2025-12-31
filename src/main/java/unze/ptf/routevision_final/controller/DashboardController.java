@@ -82,19 +82,25 @@ public class DashboardController {
 
     private void loadView(String fxmlFile) {
         try {
-            // Putanja koju koristimo (mora početi sa /)
             String path = "/unze/ptf/view/" + fxmlFile;
-
             java.net.URL resource = getClass().getResource(path);
 
-            // TEST: Ako je resource null, ispiši tačno šta fali
             if (resource == null) {
                 System.err.println("KRITIČNA GREŠKA: Ne mogu pronaći fajl na putanji: " + path);
                 return;
             }
 
             FXMLLoader loader = new FXMLLoader(resource);
-            VBox view = loader.load();
+
+            // POPRAVKA: Koristimo 'Node' umjesto 'VBox' jer je Node zajednički za sve (i VBox i ScrollPane)
+            javafx.scene.Node view = loader.load();
+
+            // Ako želiš da se sadržaj raširi preko cijelog ekrana:
+            if (view instanceof javafx.scene.layout.Region) {
+                ((javafx.scene.layout.Region) view).setMaxWidth(Double.MAX_VALUE);
+                ((javafx.scene.layout.Region) view).setMaxHeight(Double.MAX_VALUE);
+            }
+
             contentArea.getChildren().setAll(view);
 
         } catch (IOException e) {
@@ -102,7 +108,6 @@ public class DashboardController {
             e.printStackTrace();
         }
     }
-
     private void showProfile() { loadView("ProfileView.fxml"); }
 
     private void showVozaci() { loadView("VozacManagementView.fxml"); }

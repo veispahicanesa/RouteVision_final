@@ -1,46 +1,81 @@
-/* Header */
-.header-bar {
-    -fx-background-color: #1a252f; /* Tamno plava */
-    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 10, 0, 0, 5);
+/* Glavni prozor */
+.root {
+    -fx-bg-main: #F1F5F9; /* Ledeno bijela pozadina (nema sive!) */
+    -fx-sidebar-bg: #0F172A; /* Duboka Ocean plava */
+    -fx-amber: #F59E0B; /* Zlatni akcenti */
 }
 
-/* Sidebar */
+/* SIDEBAR - Lijevi meni */
 .sidebar {
-    -fx-background-color: #2c3e50;
-    -fx-padding: 10px;
+    -fx-background-color: -fx-sidebar-bg;
+    -fx-min-width: 280px;
+    -fx-padding: 0;
 }
 
-/* Dinamički meni gumbi */
+/* HEADER - Gornja traka */
+.header-bar {
+    -fx-background-color: #FFFFFF;
+    -fx-padding: 15 30;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 2);
+    -fx-border-color: #E2E8F0;
+    -fx-border-width: 0 0 1 0;
+}
+
+/* NASLOVI U HEADERU - Sada se vide kristalno jasno */
+.brand-name-top {
+    -fx-font-family: "Segoe UI Black";
+    -fx-font-size: 26px;
+    -fx-text-fill: #0F172A; /* Tamna plava na bijeloj pozadini */
+}
+
+.brand-name-sub-top {
+    -fx-font-family: "Segoe UI Bold";
+    -fx-font-size: 13px;
+    -fx-text-fill: -fx-amber;
+    -fx-letter-spacing: 4px;
+}
+
+/* DUGMAD U MENIJU */
 .menu-button {
     -fx-background-color: transparent;
-    -fx-text-fill: #bdc3c7;
+    -fx-text-fill: #94A3B8;
+    -fx-font-family: "Segoe UI Bold";
+    -fx-font-size: 15px;
+    -fx-padding: 16 25;
     -fx-alignment: CENTER_LEFT;
-    -fx-padding: 12 15;
-    -fx-font-size: 14px;
     -fx-cursor: hand;
-    -fx-border-width: 0 0 0 4;
-    -fx-border-color: transparent;
+    -fx-background-radius: 0;
 }
 
 .menu-button:hover {
-    -fx-background-color: #34495e;
+    -fx-background-color: rgba(255, 255, 255, 0.05);
     -fx-text-fill: white;
-    -fx-border-color: #3498db; /* Plava linija sa strane */
 }
 
-/* Logout Button */
-.logout-button {
-    -fx-background-color: #e74c3c;
-    -fx-text-fill: white;
-    -fx-font-weight: bold;
-    -fx-cursor: hand;
+/* Aktivno dugme - Amber indikator sa lijeve strane */
+.menu-button:selected, .menu-button:focused {
+    -fx-background-color: rgba(245, 158, 11, 0.1);
+    -fx-text-fill: -fx-amber;
+    -fx-border-color: transparent transparent transparent -fx-amber;
+    -fx-border-width: 0 0 0 5;
 }
 
-.logout-button:hover {
-    -fx-background-color: #c0392b;
-}
-
-/* Content Area */
+/* KARTICE U CENTRALNOM DIJELU */
 .content-pane {
-    -fx-background-color: #f4f7f6;
+    -fx-background-color: -fx-bg-main;
+    -fx-padding: 40;
+}
+
+.table-card {
+    -fx-background-color: white;
+    -fx-background-radius: 12;
+    -fx-padding: 25;
+    -fx-effect: dropshadow(three-pass-box, rgba(15, 23, 42, 0.08), 25, 0, 0, 10);
+}
+
+/* KORISNIČKI LABEL U HEADERU */
+.user-label {
+    -fx-font-family: "Segoe UI Semibold";
+    -fx-font-size: 14px;
+    -fx-text-fill: #475569;
 }

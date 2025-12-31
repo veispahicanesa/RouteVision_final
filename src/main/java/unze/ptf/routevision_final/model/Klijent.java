@@ -23,7 +23,6 @@ public class Klijent {
     private String racun_broj;
     private double ukupna_narudena_kolicina;
     private double ukupno_placeno;
-    private String aktivna_slika;
     private boolean aktivan;
     private LocalDateTime datum_kreiranja;
 
@@ -84,8 +83,6 @@ public class Klijent {
     public double getUkupno_placeno() { return ukupno_placeno; }
     public void setUkupno_placeno(double ukupno_placeno) { this.ukupno_placeno = ukupno_placeno; }
 
-    public String getAktivna_slika() { return aktivna_slika; }
-    public void setAktivna_slika(String aktivna_slika) { this.aktivna_slika = aktivna_slika; }
 
     public boolean isAktivan() { return aktivan; }
     public void setAktivan(boolean aktivan) { this.aktivan = aktivan; }

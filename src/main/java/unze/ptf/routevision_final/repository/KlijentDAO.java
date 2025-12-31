@@ -33,7 +33,10 @@ public class KlijentDAO {
     }
 
     public void save(Klijent klijent) throws SQLException {
-        String query = "INSERT INTO klijent (naziv_firme, tip_klijenta, adresa, mjesto, postanskiBroj, drzava, kontakt_osoba, email, broj_telefona, broj_faksa, poreska_broj, naziv_banke, racun_broj, aktivan) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String query = "INSERT INTO klijent (naziv_firme, tip_klijenta, adresa, mjesto, postanskiBroj, drzava, " +
+                "kontakt_osoba, email, broj_telefona, broj_faksa, poreska_broj, naziv_banke, racun_broj, ukupno_placeno, aktivan) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
         try (Connection conn = DatabaseConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setString(1, klijent.getNaziv_firme());
@@ -49,13 +52,17 @@ public class KlijentDAO {
             stmt.setString(11, klijent.getPoreska_broj());
             stmt.setString(12, klijent.getNaziv_banke());
             stmt.setString(13, klijent.getRacun_broj());
-            stmt.setBoolean(14, klijent.isAktivan());
+            stmt.setDouble(14, klijent.getUkupno_placeno()); // DODANO
+            stmt.setBoolean(15, klijent.isAktivan());
             stmt.executeUpdate();
         }
     }
-
     public void update(Klijent klijent) throws SQLException {
-        String query = "UPDATE klijent SET naziv_firme = ?, tip_klijenta = ?, adresa = ?, mjesto = ?, postanskiBroj = ?, drzava = ?, kontakt_osoba = ?, email = ?, broj_telefona = ? WHERE id = ?";
+        // Uklonjen zarez poslije drugog upitnika kod ukupno_placeno
+        String query = "UPDATE klijent SET naziv_firme = ?, tip_klijenta = ?, adresa = ?, mjesto = ?, " +
+                "postanskiBroj = ?, drzava = ?, kontakt_osoba = ?, email = ?, broj_telefona = ?, " +
+                "broj_faksa = ?, poreska_broj = ?, naziv_banke = ?, racun_broj = ?, ukupno_placeno = ? WHERE id = ?";
+
         try (Connection conn = DatabaseConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setString(1, klijent.getNaziv_firme());
@@ -67,11 +74,15 @@ public class KlijentDAO {
             stmt.setString(7, klijent.getKontakt_osoba());
             stmt.setString(8, klijent.getEmail());
             stmt.setString(9, klijent.getBroj_telefona());
-            stmt.setInt(10, klijent.getId());
+            stmt.setString(10, klijent.getBroj_faksa());
+            stmt.setString(11, klijent.getPoreska_broj());
+            stmt.setString(12, klijent.getNaziv_banke());
+            stmt.setString(13, klijent.getRacun_broj());
+            stmt.setDouble(14, klijent.getUkupno_placeno()); // DODANO
+            stmt.setInt(15, klijent.getId()); // ID mora biti na zadnjem mjestu (15)
             stmt.executeUpdate();
         }
     }
-
     public void delete(int id) throws SQLException {
         String query = "UPDATE klijent SET aktivan = FALSE WHERE id = ?";
         try (Connection conn = DatabaseConfig.getConnection();

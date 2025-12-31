@@ -26,11 +26,11 @@
 
         <TableView fx:id="tableView" VBox.vgrow="ALWAYS">
             <columns>
-                <TableColumn fx:id="idCol" prefWidth="50.0" text="ID" />
-                <TableColumn fx:id="nazivCol" prefWidth="200.0" text="Naziv Firme" />
-                <TableColumn fx:id="tipCol" prefWidth="120.0" text="Tip" />
-                <TableColumn fx:id="emailCol" prefWidth="180.0" text="Email" />
-                <TableColumn fx:id="telefonCol" prefWidth="150.0" text="Telefon" />
+                <TableColumn fx:id="idCol" prefWidth="40.0" text="#" /> <TableColumn fx:id="nazivCol" prefWidth="180.0" text="Naziv Firme" />
+                <TableColumn fx:id="kontaktCol" prefWidth="130.0" text="Kontakt Osoba" /> <TableColumn fx:id="tipCol" prefWidth="100.0" text="Tip" />
+                <TableColumn fx:id="emailCol" prefWidth="150.0" text="Email" />
+                <TableColumn fx:id="telefonCol" prefWidth="120.0" text="Telefon" />
+                <TableColumn fx:id="prometCol" prefWidth="110.0" text="Promet (KM)" /> <TableColumn fx:id="mjestoCol" prefWidth="150.0" text="Lokacija" />
             </columns>
             <columnResizePolicy>
                 <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />

@@ -23,6 +23,9 @@ public class KlijentManagmentController {
     @FXML private TableColumn<Klijent, String> tipCol;
     @FXML private TableColumn<Klijent, String> emailCol;
     @FXML private TableColumn<Klijent, String> telefonCol;
+    @FXML private TableColumn<Klijent, String> mjestoCol;
+    @FXML private TableColumn<Klijent, String> kontaktCol;
+    @FXML private TableColumn<Klijent, Double> prometCol;
 
     private KlijentDAO klijentDAO = new KlijentDAO();
     private ObservableList<Klijent> klijentiList;
@@ -34,16 +37,51 @@ public class KlijentManagmentController {
     }
 
     private void setupTableColumns() {
-        idCol.setCellValueFactory(cellData -> new SimpleIntegerProperty(cellData.getValue().getId()).asObject());
-        nazivCol.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getNaziv_firme()));
-        tipCol.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getTip_klijenta()));
-        emailCol.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getEmail()));
-        telefonCol.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getBroj_telefona()));
-    }
+        // 1. Redni brojevi
+        idCol.setCellFactory(column -> new TableCell<Klijent, Integer>() {
+            @Override
+            protected void updateItem(Integer item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty) {
+                    setText(null);
+                } else {
+                    setText(String.valueOf(getIndex() + 1));
+                }
+            }
+        });
 
-    @FXML
-    private void handleRefresh() {
-        loadKlijentiData();
+        // 2. Osnovni podaci
+        nazivCol.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getNaziv_firme()));
+
+        // OVO JE DODANO:
+        kontaktCol.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getKontakt_osoba()));
+
+        tipCol.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getTip_klijenta()));
+        emailCol.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getEmail()));
+        telefonCol.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getBroj_telefona()));
+        mjestoCol.setCellValueFactory(c -> new SimpleStringProperty(
+                c.getValue().getMjesto() + " (" + c.getValue().getDrzava() + ")"
+        ));
+
+        // 3. Formatiranje kolone za Promet
+        prometCol.setCellValueFactory(c -> new javafx.beans.property.SimpleObjectProperty<>(c.getValue().getUkupno_placeno()));
+        prometCol.setCellFactory(column -> new TableCell<Klijent, Double>() {
+            @Override
+            protected void updateItem(Double item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                    setStyle("");
+                } else {
+                    setText(String.format("%.2f KM", item));
+                    if (item > 5000) {
+                        setStyle("-fx-text-fill: #27ae60; -fx-font-weight: bold;");
+                    } else {
+                        setStyle("");
+                    }
+                }
+            }
+        });
     }
 
     private void loadKlijentiData() {
@@ -57,94 +95,73 @@ public class KlijentManagmentController {
     }
 
     @FXML
-    private void handleAddKlijent(ActionEvent event) {
-        Dialog<ButtonType> dialog = new Dialog<>();
-        dialog.setTitle("Dodaj Novog Klijenta");
+    private void handleRefresh() { loadKlijentiData(); }
 
-        GridPane grid = new GridPane();
-        grid.setHgap(10);
-        grid.setVgap(10);
-        grid.setPadding(new Insets(20));
-
-        TextField nazivField = new TextField();
-        nazivField.setPromptText("Naziv Firme");
-        ComboBox<String> tipCombo = new ComboBox<>(FXCollections.observableArrayList(
-                "Pojedinac", "Mala firma", "Srednja firma", "Velika firma"
-        ));
-        tipCombo.setPrefWidth(200);
-        TextField adresaField = new TextField();
-        adresaField.setPromptText("Adresa");
-        TextField mjestoField = new TextField();
-        mjestoField.setPromptText("Mjesto");
-        TextField emailField = new TextField();
-        emailField.setPromptText("Email");
-        TextField telefonField = new TextField();
-        telefonField.setPromptText("Broj Telefona");
-
-        grid.add(new Label("Naziv Firme:"), 0, 0);
-        grid.add(nazivField, 1, 0);
-        grid.add(new Label("Tip:"), 0, 1);
-        grid.add(tipCombo, 1, 1);
-        grid.add(new Label("Adresa:"), 0, 2);
-        grid.add(adresaField, 1, 2);
-        grid.add(new Label("Mjesto:"), 0, 3);
-        grid.add(mjestoField, 1, 3);
-        grid.add(new Label("Email:"), 0, 4);
-        grid.add(emailField, 1, 4);
-        grid.add(new Label("Telefon:"), 0, 5);
-        grid.add(telefonField, 1, 5);
-
-        dialog.getDialogPane().setContent(grid);
-        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
-
-        dialog.showAndWait().ifPresent(result -> {
-            if (result == ButtonType.OK) {
-                try {
-                    Klijent klijent = new Klijent(nazivField.getText(), tipCombo.getValue());
-                    klijent.setAdresa(adresaField.getText());
-                    klijent.setMjesto(mjestoField.getText());
-                    klijent.setEmail(emailField.getText());
-                    klijent.setBroj_telefona(telefonField.getText());
-
-                    klijentDAO.save(klijent);
-                    loadKlijentiData();
-                    showAlert("Uspjeh", "Klijent je uspješno dodan!");
-                } catch (SQLException e) {
-                    showAlert("Greška", "Greška pri spremanju klijenta: " + e.getMessage());
-                }
-            }
-        });
-    }
+    @FXML
+    private void handleAddKlijent(ActionEvent event) { prikaziDijalogForme(null); }
 
     @FXML
     private void handleEditKlijent(ActionEvent event) {
         Klijent selected = tableView.getSelectionModel().getSelectedItem();
-        if (selected == null) {
-            showAlert("Upozorenje", "Molimo odaberite klijenta iz tabele!");
-            return;
-        }
+        if (selected != null) prikaziDijalogForme(selected);
+        else showAlert("Upozorenje", "Odaberite klijenta iz tabele!");
+    }
 
+    private void prikaziDijalogForme(Klijent postojeci) {
         Dialog<ButtonType> dialog = new Dialog<>();
-        dialog.setTitle("Uredi Klijenta");
+        dialog.setTitle(postojeci == null ? "Dodaj Novog Klijenta" : "Uredi Klijenta");
 
         GridPane grid = new GridPane();
-        grid.setHgap(10);
-        grid.setVgap(10);
-        grid.setPadding(new Insets(20));
+        grid.setHgap(15); grid.setVgap(10); grid.setPadding(new Insets(20));
 
-        TextField nazivField = new TextField(selected.getNaziv_firme());
-        TextField adresaField = new TextField(selected.getAdresa() != null ? selected.getAdresa() : "");
-        TextField emailField = new TextField(selected.getEmail() != null ? selected.getEmail() : "");
-        TextField telefonField = new TextField(selected.getBroj_telefona() != null ? selected.getBroj_telefona() : "");
+        // KOLONA 1 - Osnovne informacije
+        TextField nazivF = new TextField();
+        ComboBox<String> tipC = new ComboBox<>(FXCollections.observableArrayList("Privatna", "Proizvodnja", "Logistika", "Inostrana"));
+        TextField adresaF = new TextField();
+        TextField mjestoF = new TextField();
+        TextField drzavaF = new TextField();
+        TextField emailF = new TextField();
 
-        grid.add(new Label("Naziv Firme:"), 0, 0);
-        grid.add(nazivField, 1, 0);
-        grid.add(new Label("Adresa:"), 0, 1);
-        grid.add(adresaField, 1, 1);
-        grid.add(new Label("Email:"), 0, 2);
-        grid.add(emailField, 1, 2);
-        grid.add(new Label("Telefon:"), 0, 3);
-        grid.add(telefonField, 1, 3);
+        // KOLONA 2 - Kontakt i Finansije
+        TextField kontaktF = new TextField();
+        TextField telF = new TextField();
+        TextField porezF = new TextField();
+        TextField bankaF = new TextField();
+        TextField racunF = new TextField();
+        TextField prometF = new TextField(); // NOVO POLJE
+        prometF.setPromptText("0.00");
+
+        // Ako je "Uredi", popuni polja iz objekta
+        if (postojeci != null) {
+            nazivF.setText(postojeci.getNaziv_firme());
+            tipC.setValue(postojeci.getTip_klijenta());
+            adresaF.setText(postojeci.getAdresa());
+            mjestoF.setText(postojeci.getMjesto());
+            drzavaF.setText(postojeci.getDrzava());
+            emailF.setText(postojeci.getEmail());
+            kontaktF.setText(postojeci.getKontakt_osoba());
+            telF.setText(postojeci.getBroj_telefona());
+            porezF.setText(postojeci.getPoreska_broj());
+            bankaF.setText(postojeci.getNaziv_banke());
+            racunF.setText(postojeci.getRacun_broj());
+            prometF.setText(String.valueOf(postojeci.getUkupno_placeno()));
+        }
+
+        // Dodavanje elemenata u Grid (Lijeva kolona)
+        grid.add(new Label("Naziv Firme:"), 0, 0); grid.add(nazivF, 1, 0);
+        grid.add(new Label("Tip Klijenta:"), 0, 1); grid.add(tipC, 1, 1);
+        grid.add(new Label("Adresa:"), 0, 2); grid.add(adresaF, 1, 2);
+        grid.add(new Label("Grad:"), 0, 3); grid.add(mjestoF, 1, 3);
+        grid.add(new Label("Država:"), 0, 4); grid.add(drzavaF, 1, 4);
+        grid.add(new Label("Email:"), 0, 5); grid.add(emailF, 1, 5);
+
+        // Dodavanje elemenata u Grid (Desna kolona)
+        grid.add(new Label("Kontakt Osoba:"), 2, 0); grid.add(kontaktF, 3, 0);
+        grid.add(new Label("Broj Telefona:"), 2, 1); grid.add(telF, 3, 1);
+        grid.add(new Label("Poreski Broj:"), 2, 2); grid.add(porezF, 3, 2);
+        grid.add(new Label("Banka:"), 2, 3); grid.add(bankaF, 3, 3);
+        grid.add(new Label("Broj Računa:"), 2, 4); grid.add(racunF, 3, 4);
+        grid.add(new Label("Ukupni Promet (KM):"), 2, 5); grid.add(prometF, 3, 5); // DODANO
 
         dialog.getDialogPane().setContent(grid);
         dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
@@ -152,52 +169,59 @@ public class KlijentManagmentController {
         dialog.showAndWait().ifPresent(result -> {
             if (result == ButtonType.OK) {
                 try {
-                    selected.setNaziv_firme(nazivField.getText());
-                    selected.setAdresa(adresaField.getText());
-                    selected.setEmail(emailField.getText());
-                    selected.setBroj_telefona(telefonField.getText());
+                    Klijent k = (postojeci == null) ? new Klijent() : postojeci;
 
-                    klijentDAO.update(selected);
+                    // Preuzimanje podataka
+                    k.setNaziv_firme(nazivF.getText());
+                    k.setTip_klijenta(tipC.getValue());
+                    k.setAdresa(adresaF.getText());
+                    k.setMjesto(mjestoF.getText());
+                    k.setDrzava(drzavaF.getText());
+                    k.setEmail(emailF.getText());
+                    k.setKontakt_osoba(kontaktF.getText());
+                    k.setBroj_telefona(telF.getText());
+                    k.setPoreska_broj(porezF.getText());
+                    k.setNaziv_banke(bankaF.getText());
+                    k.setRacun_broj(racunF.getText());
+                    k.setAktivan(true);
+
+                    // Sigurna konverzija broja
+                    try {
+                        double p = Double.parseDouble(prometF.getText().replace(",", "."));
+                        k.setUkupno_placeno(p);
+                    } catch (Exception e) {
+                        k.setUkupno_placeno(0.0);
+                    }
+
+                    // Slanje u bazu
+                    if (postojeci == null) klijentDAO.save(k);
+                    else klijentDAO.update(k);
+
                     loadKlijentiData();
-                    showAlert("Uspjeh", "Podaci o klijentu su ažurirani!");
                 } catch (SQLException e) {
-                    showAlert("Greška", "Greška pri ažuriranju: " + e.getMessage());
+                    showAlert("Greška", "Baza podataka: " + e.getMessage());
                 }
             }
         });
     }
-
     @FXML
     private void handleDeleteKlijent(ActionEvent event) {
         Klijent selected = tableView.getSelectionModel().getSelectedItem();
-        if (selected == null) {
-            showAlert("Upozorenje", "Molimo odaberite klijenta!");
-            return;
-        }
-
-        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
-        confirm.setTitle("Potvrda Brisanja");
-        confirm.setHeaderText(null);
-        confirm.setContentText("Da li ste sigurni da želite obrisati klijenta: " + selected.getNaziv_firme() + "?");
-
-        confirm.showAndWait().ifPresent(result -> {
-            if (result == ButtonType.OK) {
+        if (selected == null) return;
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION, "Obriši " + selected.getNaziv_firme() + "?", ButtonType.YES, ButtonType.NO);
+        confirm.showAndWait().ifPresent(res -> {
+            if (res == ButtonType.YES) {
                 try {
                     klijentDAO.delete(selected.getId());
                     loadKlijentiData();
-                    showAlert("Uspjeh", "Klijent je uspješno obrisan!");
-                } catch (SQLException e) {
-                    showAlert("Greška", "Greška pri brisanju: " + e.getMessage());
-                }
+                } catch (SQLException e) { showAlert("Greška", e.getMessage()); }
             }
         });
     }
 
     private void showAlert(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
+        alert.setTitle(title); alert.setHeaderText(null); alert.setContentText(message);
         alert.showAndWait();
     }
 }

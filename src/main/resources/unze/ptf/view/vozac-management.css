@@ -1,75 +1,92 @@
-/* Glavni kontejner sa blagim gradijentom pozadine */
+/* POZADINA MODULA */
 .management-container {
-    -fx-background-color: linear-gradient(to bottom right, #f8f9fa, #e9ecef);
+    -fx-background-color: #0F172A; /* Duboka Ocean plava */
 }
 
-/* Naslov sa modernim fontom i donjom linijom */
+/* NASLOV - Steel Blue sa zlatnim akcentom */
 .title-label {
-    -fx-font-size: 26px;
-    -fx-font-family: "Segoe UI Semibold";
-    -fx-text-fill: #2c3e50;
-    -fx-padding: 0 0 10 0;
+    -fx-font-family: "Segoe UI Black";
+    -fx-font-size: 28px;
+    -fx-text-fill: #94A3B8;
+    -fx-padding: 0 0 15 0;
+    -fx-border-color: transparent transparent #F59E0B transparent;
+    -fx-border-width: 0 0 2 0;
 }
 
-/* Dugmad sa zaobljenim uglovima i sjenom */
+/* --- DUGMAD (Sva su konzistentna, nema glupiranja) --- */
 .button {
-    -fx-background-radius: 8px;
-    -fx-text-fill: white;
-    -fx-font-weight: bold;
-    -fx-padding: 10 25;
+    -fx-background-radius: 5px;
+    -fx-font-family: "Segoe UI Bold";
     -fx-font-size: 13px;
+    -fx-text-fill: white;
+    -fx-padding: 10 25;
     -fx-cursor: hand;
-    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 2);
-    -fx-transition: 0.3s;
+    -fx-transition: 0.2s;
 }
 
 .button:hover {
-    -fx-translate-y: -2px; /* Efekt podizanja */
-    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 8, 0, 0, 4);
+    -fx-opacity: 0.85;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 10, 0, 0, 5);
 }
 
-.btn-add { -fx-background-color: #27ae60; }
-.btn-edit { -fx-background-color: #2980b9; }
-.btn-delete { -fx-background-color: #e74c3c; }
-.btn-refresh { -fx-background-color: #f39c12; }
+.btn-add { -fx-background-color: #10B981; }     /* Moderna zelena */
+.btn-edit { -fx-background-color: #3B82F6; }    /* Steel plava */
+.btn-delete { -fx-background-color: #EF4444; }  /* Alert crvena */
+.btn-refresh { -fx-background-color: #64748B; } /* Neutralna siva */
 
-/* MODERNA TABELA */
+/* --- MODERNA DARK TABELA --- */
 .table-view {
-    -fx-background-color: white;
-    -fx-background-radius: 12px;
-    -fx-border-radius: 12px;
-    -fx-border-color: #dcdde1;
-    -fx-padding: 5;
-    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 5);
+    -fx-background-color: #1E293B; /* Tamnija podloga za tabelu */
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+    -fx-border-color: rgba(255, 255, 255, 0.1);
+    -fx-padding: 0;
 }
 
-/* Stil zaglavlja kolona */
+/* Zaglavlje tabele */
+.table-view .column-header-background {
+    -fx-background-color: #334155; /* Tamno sivo zaglavlje */
+    -fx-background-radius: 10 10 0 0;
+}
+
 .table-view .column-header {
     -fx-background-color: transparent;
     -fx-size: 45;
-    -fx-border-color: transparent transparent #eee transparent;
 }
 
 .table-view .column-header .label {
-    -fx-text-fill: #7f8c8d;
-    -fx-font-weight: bold;
-    -fx-alignment: CENTER_LEFT;
+    -fx-text-fill: #F59E0B; /* Zlatna slova u zaglavlju */
+    -fx-font-family: "Segoe UI Black";
+    -fx-font-size: 13px;
 }
 
 /* Redovi u tabeli */
 .table-row-cell {
-    -fx-background-color: transparent;
-    -fx-border-color: transparent transparent #f1f2f6 transparent;
-    -fx-cell-size: 40;
+    -fx-background-color: #1E293B;
+    -fx-text-fill: white;
+    -fx-border-color: transparent transparent rgba(255, 255, 255, 0.05) transparent;
 }
 
-.table-row-cell:odd { -fx-background-color: #fafafa; }
-
+/* Hover efekat na red (suptilna plava) */
 .table-row-cell:hover {
-    -fx-background-color: #f1f9ff; /* Svijetlo plava kad se pređe mišem */
+    -fx-background-color: #2D3E50;
 }
 
+/* Selektovani red - da se jasno vidi */
 .table-row-cell:selected {
-    -fx-background-color: #e3f2fd;
-    -fx-text-fill: #1e88e5;
+    -fx-background-color: #3B82F6;
+    -fx-text-fill: white;
+}
+
+/* Popravka za tekst u ćelijama */
+.table-cell {
+    -fx-text-fill: #E2E8F0;
+    -fx-font-family: "Segoe UI Semibold";
+    -fx-alignment: CENTER_LEFT;
+}
+
+/* Sredite scrollbar unutar tabele da ne bude bijel */
+.table-view .scroll-bar:vertical .thumb,
+.table-view .scroll-bar:horizontal .thumb {
+    -fx-background-color: #475569;
 }

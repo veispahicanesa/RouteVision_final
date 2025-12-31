@@ -17,19 +17,25 @@
 
         <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="button-box">
             <children>
-                <Button mnemonicParsing="false" onAction="#markAsPaid" styleClass="btn-paid" text="Označi Plaćeno" />
-                <Button mnemonicParsing="false" onAction="#deleteFaktura" styleClass="btn-delete" text="Obriši" />
+                <Button fx:id="btnAdd" mnemonicParsing="false" onAction="#handleAddFaktura" styleClass="btn-add" text="Nova Faktura" />
+
+                <Button fx:id="btnEdit" mnemonicParsing="false" onAction="#handleEditFaktura" styleClass="btn-edit" text="Uredi" />
+                <Button fx:id="btnDelete" mnemonicParsing="false" onAction="#deleteFaktura" styleClass="btn-delete" text="Obriši" />
+                <Button fx:id="btnMarkPaid" mnemonicParsing="false" onAction="#markAsPaid" styleClass="btn-paid" text="Označi Plaćeno" />
                 <Button mnemonicParsing="false" onAction="#loadData" styleClass="btn-refresh" text="Osvježi" />
             </children>
         </HBox>
 
         <TableView fx:id="tableView" VBox.vgrow="ALWAYS">
             <columns>
-                <TableColumn fx:id="idCol" prefWidth="50.0" text="ID" />
-                <TableColumn fx:id="brojCol" prefWidth="150.0" text="Broj Fakture" />
-                <TableColumn fx:id="iznosCol" prefWidth="100.0" text="Iznos" />
-                <TableColumn fx:id="statusCol" prefWidth="120.0" text="Status" />
-                <TableColumn fx:id="vrstaCol" prefWidth="150.0" text="Usluga" />
+                <TableColumn fx:id="idCol" prefWidth="40.0" text="ID" />
+                <TableColumn fx:id="brojCol" prefWidth="120.0" text="Broj Fakture" />
+                <TableColumn fx:id="datumIzdavanjaCol" prefWidth="100.0" text="Datum Izd." />
+                <TableColumn fx:id="datumDospjecaCol" prefWidth="100.0" text="Dospijeće" />
+                <TableColumn fx:id="vrstaCol" prefWidth="130.0" text="Usluga" />
+                <TableColumn fx:id="porezCol" prefWidth="80.0" text="Porez (KM)" />
+                <TableColumn fx:id="iznosCol" prefWidth="100.0" text="Ukupan Iznos" />
+                <TableColumn fx:id="statusCol" prefWidth="100.0" text="Status" />
             </columns>
             <columnResizePolicy>
                 <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />

@@ -25,10 +25,16 @@
         <TableView fx:id="tableView" VBox.vgrow="ALWAYS">
             <columns>
                 <TableColumn fx:id="brojCol" prefWidth="100.0" text="Broj Ture" />
-                <TableColumn fx:id="relacijaCol" prefWidth="250.0" text="Relacija (Od -> Do)" />
-                <TableColumn fx:id="datumCol" prefWidth="120.0" text="Datum Početka" />
-                <TableColumn fx:id="kmCol" prefWidth="100.0" text="KM" />
-                <TableColumn fx:id="statusCol" prefWidth="120.0" text="Status" />
+                <TableColumn fx:id="relacijaCol" prefWidth="200.0" text="Relacija (Od -> Do)" />
+                <TableColumn fx:id="datumCol" prefWidth="100.0" text="Datum" />
+
+                <TableColumn fx:id="vrijemeCol" prefWidth="80.0" text="Vrijeme" />
+
+                <TableColumn fx:id="kmCol" prefWidth="80.0" text="KM" />
+
+                <TableColumn fx:id="gorivoCol" prefWidth="100.0" text="Gorivo (L)" />
+
+                <TableColumn fx:id="statusCol" prefWidth="100.0" text="Status" />
             </columns>
             <columnResizePolicy>
                 <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />

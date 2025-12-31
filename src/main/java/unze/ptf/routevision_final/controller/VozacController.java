@@ -46,7 +46,18 @@ public class VozacController {
     }
 
     private void setupTableColumns() {
-        idCol.setCellValueFactory(cellData -> new SimpleIntegerProperty(cellData.getValue().getId()).asObject());
+        idCol.setCellFactory(column -> new TableCell<Vozac, Integer>() {
+            @Override
+            protected void updateItem(Integer item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty) {
+                    setText(null);
+                } else {
+                    // getIndex() daje poziciju u tabeli, dodajemo +1 da krene od 1
+                    setText(String.valueOf(getIndex() + 1));
+                }
+            }
+        });
         imeCol.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getIme()));
         prezimeCol.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getPrezime()));
         emailCol.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getEmail()));
@@ -186,7 +197,8 @@ public class VozacController {
 
         GridPane grid = new GridPane();
         grid.setHgap(10); grid.setVgap(10); grid.setPadding(new Insets(20));
-        TextField tureField = new TextField(String.valueOf(selected.getBroj_dovrsenih_tura()));
+
+
         TextField imeField = new TextField(selected.getIme());
         TextField prezimeField = new TextField(selected.getPrezime());
         TextField emailField = new TextField(selected.getEmail());
@@ -194,11 +206,13 @@ public class VozacController {
         TextField plataField = new TextField(String.valueOf(selected.getPlata()));
         TextField kategorijaField = new TextField(selected.getKategorija_dozvole());
         TextField dozvolaField = new TextField(selected.getBroj_vozacke_dozvole());
+        TextField tureField = new TextField(String.valueOf(selected.getBroj_dovrsenih_tura()));
+
         ComboBox<Kamion> kamionCombo = new ComboBox<>();
 
         try {
             setupKamionComboBox(kamionCombo);
-            // Logika za selektovanje trenutnog kamiona u ComboBox-u
+            // Postavljanje trenutnog kamiona u ComboBox
             if (selected.getKamionId() != null) {
                 for (Kamion k : kamionCombo.getItems()) {
                     if (k.getId() == selected.getKamionId()) {
@@ -207,8 +221,11 @@ public class VozacController {
                     }
                 }
             }
-        } catch (SQLException e) { e.printStackTrace(); }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 
+        // Dodavanje elemenata u grid
         grid.add(new Label("Ime:"), 0, 0); grid.add(imeField, 1, 0);
         grid.add(new Label("Prezime:"), 0, 1); grid.add(prezimeField, 1, 1);
         grid.add(new Label("Email:"), 0, 2); grid.add(emailField, 1, 2);
@@ -217,8 +234,7 @@ public class VozacController {
         grid.add(new Label("Kategorija:"), 0, 5); grid.add(kategorijaField, 1, 5);
         grid.add(new Label("Broj Dozvole:"), 0, 6); grid.add(dozvolaField, 1, 6);
         grid.add(new Label("Dodijeli Kamion:"), 0, 7); grid.add(kamionCombo, 1, 7);
-        grid.add(new Label("Broj završenih tura:"), 0, 8);
-        grid.add(tureField, 1, 8);
+        grid.add(new Label("Završene ture:"), 0, 8); grid.add(tureField, 1, 8);
 
         dialog.getDialogPane().setContent(grid);
         dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
@@ -226,28 +242,29 @@ public class VozacController {
         dialog.showAndWait().ifPresent(result -> {
             if (result == ButtonType.OK) {
                 try {
-                    // Ažuriranje objekta
-                    selected.setIme(imeField.getText());
-                    selected.setPrezime(prezimeField.getText());
+
+                    String novoIme = imeField.getText();
+                    String novoPrezime = prezimeField.getText();
+                    double novaPlata;
+                    int noveTure;
+
+                    try {
+                        novaPlata = Double.parseDouble(plataField.getText());
+                        noveTure = Integer.parseInt(tureField.getText());
+                    } catch (NumberFormatException nfe) {
+                        showAlert("Greška", "Plata i broj tura moraju biti brojevi!");
+                        return;
+                    }
+
+
+                    selected.setIme(novoIme);
+                    selected.setPrezime(novoPrezime);
                     selected.setEmail(emailField.getText());
                     selected.setBroj_telefona(telefonField.getText());
                     selected.setKategorija_dozvole(kategorijaField.getText());
                     selected.setBroj_vozacke_dozvole(dozvolaField.getText());
-
-                    try {
-                        selected.setPlata(Double.parseDouble(plataField.getText()));
-                    } catch (NumberFormatException nfe) {
-                        showAlert("Greška", "Plata mora biti broj!");
-                        return;
-                    }
-
-                    try {
-                        selected.setBroj_dovrsenih_tura(Integer.parseInt(tureField.getText()));
-                    } catch (NumberFormatException nfe) {
-                        showAlert("Greška", "Broj tura mora biti cijeli broj!");
-                        return;
-                    }
-
+                    selected.setPlata(novaPlata);
+                    selected.setBroj_dovrsenih_tura(noveTure);
 
                     if (kamionCombo.getValue() != null) {
                         selected.setKamionId(kamionCombo.getValue().getId());
@@ -257,20 +274,27 @@ public class VozacController {
                         selected.setMarka_kamiona(null);
                     }
 
-                    // 1. Spašavanje u bazu (koristi novu metodu koja uključuje platu i kamion)
                     vozacDAO.update(selected);
 
-                    // 2. Ažuriranje asocijacija
                     vozacDAO.updateAssignment(selected.getId(), selected.getKamionId(), selected.getOpremaId());
 
-                    // 3. OSVJEŽAVANJE TABELE
-                    tableView.refresh();
-                    loadVozaciData();
 
-                    showAlert("Uspjeh", "Podaci o vozaču su uspješno ažurirani.");
+                    KamionDAO kamionDAO = new KamionDAO();
+                    kamionDAO.updateVozacNaKamionu(
+                            selected.getId(),
+                            selected.getIme(),
+                            selected.getPrezime(),
+                            selected.getKamionId()
+                    );
+
+                    loadVozaciData();
+                    tableView.refresh();
+
+                    showAlert("Uspjeh", "Podaci su uspješno ažurirani u oba modula.");
 
                 } catch (SQLException e) {
                     showAlert("Greška", "Baza podataka: " + e.getMessage());
+                    e.printStackTrace();
                 }
             }
         });

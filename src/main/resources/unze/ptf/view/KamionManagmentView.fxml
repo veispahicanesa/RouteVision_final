@@ -28,20 +28,21 @@
         </HBox>
 
         <TableView fx:id="tableView" VBox.vgrow="ALWAYS">
-            <columns>
-                <TableColumn fx:id="idCol" prefWidth="50.0" text="ID" />
-                <TableColumn fx:id="registarskaCol" prefWidth="120.0" text="Reg. Tablica" />
-                <TableColumn fx:id="markaCol" prefWidth="120.0" text="Marka" />
-                <TableColumn fx:id="modelCol" prefWidth="120.0" text="Model" />
-                <TableColumn fx:id="kapacitetCol" prefWidth="100.0" text="Kapacitet (t)" />
-                <TableColumn fx:id="kmCol" prefWidth="100.0" text="km" />
-                <TableColumn fx:id="godinaCol" text="Godina" prefWidth="70" />
-                <TableColumn fx:id="datumRegCol" text="Datum Reg." prefWidth="100" />
-                <TableColumn fx:id="vozacImeCol" text="Vozač" prefWidth="120" />
-            </columns>
-            <columnResizePolicy>
-                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-            </columnResizePolicy>
-        </TableView>
+        <columns>
+            <TableColumn fx:id="idCol" prefWidth="50.0" text="ID" />
+            <TableColumn fx:id="registarskaCol" prefWidth="120.0" text="Reg. Tablica" />
+            <TableColumn fx:id="markaCol" prefWidth="120.0" text="Marka" />
+            <TableColumn fx:id="modelCol" prefWidth="120.0" text="Model" />
+            <TableColumn fx:id="kapacitetCol" prefWidth="100.0" text="Kapacitet (t)" />
+            <TableColumn fx:id="kmCol" prefWidth="100.0" text="km" />
+            <TableColumn fx:id="godinaCol" prefWidth="70" text="Godina" />
+            <TableColumn fx:id="datumRegCol" prefWidth="100" text="Datum Reg." />
+
+            <TableColumn fx:id="vozacImeCol" prefWidth="150.0" text="Zaduženi Vozač" />
+        </columns>
+        <columnResizePolicy>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+        </columnResizePolicy>
+    </TableView>
     </children>
 </VBox>

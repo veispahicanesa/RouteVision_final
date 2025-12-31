@@ -199,12 +199,12 @@ public class ProfileController {
         TextField prezimeField = new TextField(admin.getPrezime());
         TextField emailField = new TextField(admin.getEmail());
         TextField telefonField = new TextField(admin.getBroj_telefona() != null ? admin.getBroj_telefona() : "");
-
+        TextField plataField = new TextField(String.valueOf(admin.getPlata()));
         grid.add(new Label("Ime:"), 0, 0); grid.add(imeField, 1, 0);
         grid.add(new Label("Prezime:"), 0, 1); grid.add(prezimeField, 1, 1);
         grid.add(new Label("Email:"), 0, 2); grid.add(emailField, 1, 2);
         grid.add(new Label("Broj Telefona:"), 0, 3); grid.add(telefonField, 1, 3);
-
+        grid.add(new Label("Plata (KM):"), 0, 4); grid.add(plataField, 1, 4);
         dialog.getDialogPane().setContent(grid);
         dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 
@@ -217,7 +217,14 @@ public class ProfileController {
                     admin.setEmail(emailField.getText());
                     admin.setBroj_telefona(telefonField.getText());
 
-                    // POZIV DAO - Mora biti jedan argument
+                    try {
+                        double novaPlata = Double.parseDouble(plataField.getText());
+                        admin.setPlata(novaPlata);
+                    } catch (NumberFormatException nfe) {
+                        showAlert("Greška", "Plata mora biti brojčana vrijednost!");
+                        return; // Prekida izvršavanje ako unos nije broj
+                    }
+
                     AdminDAO dao = new AdminDAO();
                     dao.update(admin);
 

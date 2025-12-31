@@ -43,7 +43,7 @@ public class VozacDAO {
     }
     public List<Vozac> findAll() throws SQLException {
         List<Vozac> vozaci = new ArrayList<>();
-        String query = "SELECT * FROM vozac WHERE aktivan = TRUE ORDER BY prezime, ime";
+        String query = "SELECT * FROM vozac WHERE aktivan = TRUE ORDER BY id ASC";
         try (Connection conn = DatabaseConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
             ResultSet rs = stmt.executeQuery();

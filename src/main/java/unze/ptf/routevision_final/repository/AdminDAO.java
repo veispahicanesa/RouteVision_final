@@ -12,8 +12,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.sql.Statement;
 
-// DAO klasa za pristup tabeli 'admin'. Sadrži metode za dohvat,
-// spremanje i mapiranje Admin objekata iz baze podataka.
 public class AdminDAO {
     public Admin findByEmail(String email) throws SQLException {
         String query = "SELECT * FROM admin WHERE email = ? AND aktivan = TRUE";
@@ -92,8 +90,7 @@ public class AdminDAO {
     //dodala Anesa
 
     public void update(Admin admin) throws SQLException {
-        String query = "UPDATE admin SET ime = ?, prezime = ?, broj_telefona = ?,email = ? WHERE id = ?";
-
+        String query = "UPDATE admin SET ime = ?, prezime = ?, broj_telefona = ?, email = ?, plata = ? WHERE id = ?";
         try (Connection conn = DatabaseConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
 
@@ -101,7 +98,8 @@ public class AdminDAO {
             stmt.setString(2, admin.getPrezime());
             stmt.setString(3, admin.getBroj_telefona());
             stmt.setString(4, admin.getEmail());
-            stmt.setInt(5, admin.getId());
+            stmt.setDouble(5, admin.getPlata());
+            stmt.setInt(6, admin.getId());
 
             stmt.executeUpdate();
         }
@@ -111,7 +109,7 @@ public class AdminDAO {
 
     public List<Admin> findAll() throws SQLException {
         List<Admin> admini = new ArrayList<>();
-        String query = "SELECT * FROM admin WHERE aktivan = TRUE";
+        String query = "SELECT * FROM admin WHERE aktivan = TRUE ORDER BY id ASC";
         try (Connection conn = DatabaseConfig.getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(query)) {

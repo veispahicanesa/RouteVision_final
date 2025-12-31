@@ -17,9 +17,9 @@
 
         <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="button-box">
             <children>
-                <Button mnemonicParsing="false" onAction="#handleAddOprema" styleClass="btn-add" text="Dodaj Opremu" />
-                <Button mnemonicParsing="false" onAction="#handleEditOprema" styleClass="btn-edit" text="Uredi" />
-                <Button mnemonicParsing="false" onAction="#handleDeleteOprema" styleClass="btn-delete" text="Obriši" />
+                <Button fx:id="btnAdd" onAction="#handleAddOprema" styleClass="btn-add" text="Dodaj Opremu" />
+                <Button fx:id="btnEdit" onAction="#handleEditOprema" styleClass="btn-edit" text="Uredi" />
+                <Button fx:id="btnDelete" onAction="#handleDeleteOprema" styleClass="btn-delete" text="Obriši" />
                 <Button mnemonicParsing="false" onAction="#handleRefresh" styleClass="btn-refresh" text="Osvježi" />
             </children>
         </HBox>
@@ -31,6 +31,10 @@
                 <TableColumn fx:id="vrstaCol" prefWidth="120.0" text="Vrsta" />
                 <TableColumn fx:id="kapacitetCol" prefWidth="100.0" text="Kapacitet" />
                 <TableColumn fx:id="stanjeCol" prefWidth="120.0" text="Stanje" />
+                <TableColumn fx:id="datumNabavkeCol" prefWidth="120.0" text="Datum Nabavke" />
+                <TableColumn fx:id="zadnjaProvjeraCol" prefWidth="120.0" text="Zadnja Provjera" />
+                <TableColumn fx:id="napomenaCol" prefWidth="180.0" text="Napomena" />
+
             </columns>
             <columnResizePolicy>
                 <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />

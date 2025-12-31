@@ -35,36 +35,41 @@ public class OpremaDAO {
         try (Connection conn = DatabaseConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setInt(1, vozacId);
-            ResultSet rs = stmt.executeQuery();
-            while (rs.next()) lista.add(mapResultSetToOprema(rs));
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) lista.add(mapResultSetToOprema(rs));
+            }
         }
         return lista;
     }
 
     public void save(Oprema o) throws SQLException {
-        String query = "INSERT INTO oprema (naziv, vrsta, kamion_id, kapacitet, stanje, napomena, aktivan) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String query = "INSERT INTO oprema (naziv, vrsta, kapacitet, stanje, napomena, datum_nabavke, datum_zadnje_provjere, aktivan) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = DatabaseConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setString(1, o.getNaziv());
             stmt.setString(2, o.getVrsta());
-            stmt.setObject(3, o.getKamion_id());
-            stmt.setDouble(4, o.getKapacitet());
-            stmt.setString(5, o.getStanje());
-            stmt.setString(6, o.getNapomena());
-            stmt.setBoolean(7, true);
+            stmt.setDouble(3, o.getKapacitet());
+            stmt.setString(4, o.getStanje());
+            stmt.setString(5, o.getNapomena());
+            stmt.setDate(6, o.getDatum_nabavke() != null ? Date.valueOf(o.getDatum_nabavke()) : null);
+            stmt.setDate(7, o.getDatum_zadnje_provjere() != null ? Date.valueOf(o.getDatum_zadnje_provjere()) : null);
+            stmt.setBoolean(8, true);
             stmt.executeUpdate();
         }
     }
 
     public void update(Oprema o) throws SQLException {
-        String query = "UPDATE oprema SET naziv = ?, vrsta = ?, stanje = ?, napomena = ? WHERE id = ?";
+        String query = "UPDATE oprema SET naziv = ?, vrsta = ?, kapacitet = ?, stanje = ?, napomena = ?, datum_nabavke = ?, datum_zadnje_provjere = ? WHERE id = ?";
         try (Connection conn = DatabaseConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setString(1, o.getNaziv());
             stmt.setString(2, o.getVrsta());
-            stmt.setString(3, o.getStanje());
-            stmt.setString(4, o.getNapomena());
-            stmt.setInt(5, o.getId());
+            stmt.setDouble(3, o.getKapacitet());
+            stmt.setString(4, o.getStanje());
+            stmt.setString(5, o.getNapomena());
+            stmt.setDate(6, o.getDatum_nabavke() != null ? Date.valueOf(o.getDatum_nabavke()) : null);
+            stmt.setDate(7, o.getDatum_zadnje_provjere() != null ? Date.valueOf(o.getDatum_zadnje_provjere()) : null);
+            stmt.setInt(8, o.getId());
             stmt.executeUpdate();
         }
     }
@@ -83,10 +88,17 @@ public class OpremaDAO {
         o.setId(rs.getInt("id"));
         o.setNaziv(rs.getString("naziv"));
         o.setVrsta(rs.getString("vrsta"));
-        o.setKamion_id(rs.getObject("kamion_id") != null ? rs.getInt("kamion_id") : null);
         o.setKapacitet(rs.getDouble("kapacitet"));
         o.setStanje(rs.getString("stanje"));
         o.setAktivan(rs.getBoolean("aktivan"));
+        o.setNapomena(rs.getString("napomena"));
+
+        if (rs.getDate("datum_nabavke") != null) {
+            o.setDatum_nabavke(rs.getDate("datum_nabavke").toLocalDate());
+        }
+        if (rs.getDate("datum_zadnje_provjere") != null) {
+            o.setDatum_zadnje_provjere(rs.getDate("datum_zadnje_provjere").toLocalDate());
+        }
         return o;
     }
 }

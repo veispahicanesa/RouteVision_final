@@ -13,7 +13,6 @@ public class Oprema {
     private int id;
     private String naziv;
     private String vrsta;
-    private Integer kamion_id;
     private double kapacitet;
     private String stanje;
     private LocalDate datum_nabavke;
@@ -39,9 +38,6 @@ public class Oprema {
 
     public String getVrsta() { return vrsta; }
     public void setVrsta(String vrsta) { this.vrsta = vrsta; }
-
-    public Integer getKamion_id() { return kamion_id; }
-    public void setKamion_id(Integer kamion_id) { this.kamion_id = kamion_id; }
 
     public double getKapacitet() { return kapacitet; }
     public void setKapacitet(double kapacitet) { this.kapacitet = kapacitet; }

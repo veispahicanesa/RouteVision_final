@@ -13,6 +13,9 @@ module unze.ptf.routevision_final {
         requires org.kordamp.bootstrapfx.core;
     requires java.desktop;
 
+    requires openhtmltopdf.core;
+    requires openhtmltopdf.pdfbox;
+
     // 1. Dozvoljava pristup glavnoj aplikaciji (HelloApplication)
     opens unze.ptf.routevision_final to javafx.fxml;
 
@@ -21,6 +24,7 @@ module unze.ptf.routevision_final {
 
     // 3. Dozvoljava pristup FXML fajlovima u novom 'view' paketu
     opens unze.ptf.view to javafx.fxml;
+    opens unze.ptf.routevision_final.model to javafx.base;
 
     exports unze.ptf.routevision_final;
 

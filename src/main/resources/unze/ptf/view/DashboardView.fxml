@@ -21,21 +21,15 @@
                         <Insets left="20.0" />
                     </HBox.margin>
                 </Label>
-                <HBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
+                <HBox alignment="CENTER_RIGHT" spacing="15.0" HBox.hgrow="ALWAYS">
                     <children>
-                        <Label fx:id="userLabel" text="Korisnik: Ime Prezime (Role)" textFill="WHITE">
-                            <HBox.margin>
-                                <Insets right="20.0" />
-                            </HBox.margin>
-                        </Label>
-                        <Button mnemonicParsing="false" onAction="#handleLogout" styleClass="logout-button" text="Odjava">
-
-                            <HBox.margin>
-                                <Insets right="20.0" />
-                            </HBox.margin>
-                        </Button>
-                        <Button fx:id="btnTheme" text="Promijeni temu" onAction="#toggleTheme" />
+                        <Label fx:id="userLabel" text="Korisnik: Ime Prezime (Role)" textFill="WHITE" />
+                        <Button fx:id="btnTheme" onAction="#toggleTheme" styleClass="theme-button" text="Promijeni temu" />
+                        <Button onAction="#handleLogout" styleClass="logout-button" text="Odjava" />
                     </children>
+                    <HBox.margin>
+                        <Insets right="20.0" />
+                    </HBox.margin>
                 </HBox>
             </children>
         </HBox>
@@ -50,14 +44,28 @@
     </left>
 
     <center>
-        <VBox fx:id="contentArea" alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="20.0" styleClass="content-pane" BorderPane.alignment="CENTER">
+        <VBox fx:id="contentArea" alignment="CENTER" spacing="30.0" styleClass="content-pane" BorderPane.alignment="CENTER">
             <children>
-                <Label text="Dobrodošli u RouteVision" textFill="#7f8c8d">
+                <Label text="Dobrodošli u RouteVision" textFill="#2c3e50">
                     <font>
-                        <Font size="24.0" />
+                        <Font name="System Bold" size="32.0" />
                     </font>
                 </Label>
-                <Label text="Odaberite opciju iz menija sa lijeve strane." textFill="#95a5a6" />
+
+                <VBox alignment="CENTER" spacing="15" maxWidth="350" prefHeight="250"
+                      style="-fx-background-color: white; -fx-background-radius: 20; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 5); -fx-cursor: hand;"
+                      onMouseClicked="#handleDownloadReport">
+                    <children>
+                        <Label text="📄" style="-fx-font-size: 50px;" />
+                        <Label text="Generiši PDF Izvještaj" style="-fx-font-size: 20px; -fx-font-weight: bold;" />
+                        <Label text="Kliknite ovdje da preuzmete trenutne podatke o voznom parku u PDF formatu."
+                               textAlignment="CENTER" wrapText="true" style="-fx-text-fill: #7f8c8d; -fx-padding: 0 20 0 20;" />
+                        <Button fx:id="btnDownloadReport" onAction="#handleDownloadReport" styleClass="pdf-button" text="PREUZMI SADA" />
+                    </children>
+                    <padding>
+                        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                    </padding>
+                </VBox>
             </children>
         </VBox>
     </center>

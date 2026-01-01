@@ -8,7 +8,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox fx:id="mainContainer" spacing="15.0" styleClass="management-container" stylesheets="@vozac-management.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="unze.ptf.routevision_final.controller.AdminListController">
+<VBox fx:id="mainContainer" spacing="15.0" styleClass="management-container" stylesheets="@admin.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="unze.ptf.routevision_final.controller.AdminListController">
     <padding>
         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
     </padding>

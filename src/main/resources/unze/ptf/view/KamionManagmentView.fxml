@@ -5,44 +5,44 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
-<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.ScrollPane?> <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox fx:id="mainContainer" spacing="15.0" styleClass="management-container" stylesheets="@kamion-management.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="unze.ptf.routevision_final.controller.KamionManagementController">
-    <padding>
-        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
-    </padding>
-    <children>
-        <Label styleClass="title-label" text="Upravljanje Kamionima" />
-
-        <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="button-box">
+<ScrollPane fitToWidth="true" fitToHeight="true" styleClass="main-scroll-pane" stylesheets="@kamion-management.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="unze.ptf.routevision_final.controller.KamionManagementController">
+    <content>
+        <VBox fx:id="mainContainer" spacing="15.0" styleClass="management-container">
+            <padding>
+                <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+            </padding>
             <children>
-                <Button fx:id="btnAdd" mnemonicParsing="false" onAction="#handleAddKamion" styleClass="btn-add" text="Dodaj Kamion" />
+                <Label styleClass="title-label" text="Upravljanje Kamionima" />
 
-                <Button fx:id="btnEdit" mnemonicParsing="false" onAction="#handleEditKamion" styleClass="btn-edit" text="Uredi" />
+                <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="button-box">
+                    <children>
+                        <Button fx:id="btnAdd" mnemonicParsing="false" onAction="#handleAddKamion" styleClass="btn-add" text="Dodaj Kamion" />
+                        <Button fx:id="btnEdit" mnemonicParsing="false" onAction="#handleEditKamion" styleClass="btn-edit" text="Uredi" />
+                        <Button fx:id="btnDelete" mnemonicParsing="false" onAction="#handleDeleteKamion" styleClass="btn-delete" text="Obriši" />
+                        <Button mnemonicParsing="false" onAction="#handleRefresh" styleClass="btn-refresh" text="Osvježi" />
+                    </children>
+                </HBox>
 
-                <Button fx:id="btnDelete" mnemonicParsing="false" onAction="#handleDeleteKamion" styleClass="btn-delete" text="Obriši" />
-
-                <Button mnemonicParsing="false" onAction="#handleRefresh" styleClass="btn-refresh" text="Osvježi" />
+                <TableView fx:id="tableView" VBox.vgrow="ALWAYS">
+                    <columns>
+                        <TableColumn fx:id="idCol" prefWidth="50.0" text="ID" />
+                        <TableColumn fx:id="registarskaCol" prefWidth="120.0" text="Reg. Tablica" />
+                        <TableColumn fx:id="markaCol" prefWidth="120.0" text="Marka" />
+                        <TableColumn fx:id="modelCol" prefWidth="120.0" text="Model" />
+                        <TableColumn fx:id="kapacitetCol" prefWidth="100.0" text="Kapacitet (t)" />
+                        <TableColumn fx:id="kmCol" prefWidth="100.0" text="km" />
+                        <TableColumn fx:id="godinaCol" prefWidth="70" text="Godina" />
+                        <TableColumn fx:id="datumRegCol" prefWidth="100" text="Datum Reg." />
+                        <TableColumn fx:id="vozacImeCol" prefWidth="150.0" text="Zaduženi Vozač" />
+                    </columns>
+                    <columnResizePolicy>
+                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                    </columnResizePolicy>
+                </TableView>
             </children>
-        </HBox>
-
-        <TableView fx:id="tableView" VBox.vgrow="ALWAYS">
-        <columns>
-            <TableColumn fx:id="idCol" prefWidth="50.0" text="ID" />
-            <TableColumn fx:id="registarskaCol" prefWidth="120.0" text="Reg. Tablica" />
-            <TableColumn fx:id="markaCol" prefWidth="120.0" text="Marka" />
-            <TableColumn fx:id="modelCol" prefWidth="120.0" text="Model" />
-            <TableColumn fx:id="kapacitetCol" prefWidth="100.0" text="Kapacitet (t)" />
-            <TableColumn fx:id="kmCol" prefWidth="100.0" text="km" />
-            <TableColumn fx:id="godinaCol" prefWidth="70" text="Godina" />
-            <TableColumn fx:id="datumRegCol" prefWidth="100" text="Datum Reg." />
-
-            <TableColumn fx:id="vozacImeCol" prefWidth="150.0" text="Zaduženi Vozač" />
-        </columns>
-        <columnResizePolicy>
-            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-        </columnResizePolicy>
-    </TableView>
-    </children>
-</VBox>
+        </VBox>
+    </content>
+</ScrollPane>

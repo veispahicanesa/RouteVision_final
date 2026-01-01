@@ -29,10 +29,12 @@
                             </HBox.margin>
                         </Label>
                         <Button mnemonicParsing="false" onAction="#handleLogout" styleClass="logout-button" text="Odjava">
+
                             <HBox.margin>
                                 <Insets right="20.0" />
                             </HBox.margin>
                         </Button>
+                        <Button fx:id="btnTheme" text="Promijeni temu" onAction="#toggleTheme" />
                     </children>
                 </HBox>
             </children>

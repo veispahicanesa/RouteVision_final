@@ -1,76 +1,147 @@
-/* Pozadina - bogata, tamna morska plava */
+/* --- LOGIN VIEW: NAPUCANA VERZIJA --- */
+
 .root-container {
-    -fx-background-color: #0F172A;
+    /* Gradijent daje dubinu koju obična boja nema */
+    -fx-background-color: radial-gradient(center 50% 50%, radius 100%, #1e293b, #0F172A);
 }
 
-/* Kartica - bijela sa oštrim ivicama i "Glow" efektom */
+/* KARTICA - Glassmorphism efekt za modernost */
 .login-card {
     -fx-background-color: white;
-    -fx-background-radius: 4; /* Manje zaobljenja za ozbiljniji izgled */
+    -fx-background-radius: 12; /* Blago povećano za premium osjećaj */
     -fx-padding: 50;
-    -fx-spacing: 30;
-    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.5), 50, 0, 0, 20);
+    -fx-spacing: 25;
+    /* Složena sjena: jedna za dubinu, druga za mekoću */
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.4), 40, 0, 0, 20);
 }
 
-/* HN BRANDING - Fokus na snagu */
+/* --- HN BRANDING: NAPUCANA VERZIJA --- */
+
+/* Inicijali (HN) - Dodajemo suptilan sjaj umjesto obične boje */
 .brand-initials {
-    -fx-font-family: "Arial Black"; /* Najteži sistemski font */
-    -fx-font-size: 64px;
-    -fx-text-fill: #0F172A;
-    -fx-letter-spacing: -4px;
+    -fx-font-family: "System";
+    -fx-font-weight: 900;
+    -fx-font-size: 72px; /* Malo veći za bolji balans */
+    -fx-text-fill: linear-gradient(to bottom, #1e293b, #0F172A);
+    -fx-letter-spacing: -5px;
+    /* Suptilna sjena ispod slova za 3D efekt */
+    -fx-effect: dropshadow(two-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 3);
+}
+
+/* Krug oko logoa (ako ga koristiš u FXML-u) */
+.logo-circle {
+    -fx-fill: white;
+    -fx-stroke: #F59E0B;
+    -fx-stroke-width: 3;
+    -fx-effect: dropshadow(three-pass-box, rgba(245, 158, 11, 0.2), 15, 0, 0, 0);
 }
 
 .brand-name-sub {
-    -fx-font-family: "Segoe UI Semibold";
-    -fx-font-size: 14px;
-    -fx-text-fill: #F59E0B; /* Amber/Zlatna boja (kao svjetla na kamionu) */
-    -fx-letter-spacing: 8px;
-    -fx-padding: -10 0 0 0;
-}
-
-/* LOGO - Krug sa kamionom */
-.logo-circle {
-    -fx-fill: #0F172A;
-    -fx-stroke: #F59E0B;
-    -fx-stroke-width: 2;
-}
-
-/* INPUT POLJA - Čvrsta i upečatljiva */
-.input-label {
     -fx-font-family: "Segoe UI Bold";
     -fx-font-size: 13px;
-    -fx-text-fill: #1E293B;
+    -fx-text-fill: #F59E0B;
+    -fx-letter-spacing: 7px; /* Razmaknuta slova za luksuzan izgled */
     -fx-text-transform: uppercase;
 }
 
+/* --- DARK MODE LOGO POPRAVKA --- */
+
+/* U tamnom modu logo mora da "svijetli" */
+.dark-mode .brand-initials {
+    -fx-text-fill: linear-gradient(to bottom, #FFFFFF, #CBD5E1);
+    /* Amber sjaj oko slova u mraku - "Neon" efekt */
+    -fx-effect: dropshadow(three-pass-box, rgba(245, 158, 11, 0.4), 20, 0, 0, 0);
+}
+
+.dark-mode .logo-circle {
+    -fx-fill: #1E293B;
+    -fx-stroke: #F59E0B;
+    /* Glow efekt kruga u mraku */
+    -fx-effect: dropshadow(three-pass-box, #F59E0B, 15, 0, 0, 0);
+}
+
+
+/* INPUT POLJA - Čista elegancija */
+.input-label {
+    -fx-font-family: "Segoe UI Semibold";
+    -fx-font-size: 11px;
+    -fx-text-fill: #64748b; /* Suptilnija boja za bolji kontrast */
+    -fx-letter-spacing: 1px;
+}
+
 .input-field {
-    -fx-background-color: #F8FAFC;
-    -fx-border-color: #E2E8F0;
-    -fx-border-width: 0 0 2 0; /* Samo linija na dnu, moderan stil */
-    -fx-font-size: 16px;
-    -fx-padding: 12 5;
+    -fx-background-color: #f1f5f9;
+    -fx-background-radius: 8;
+    -fx-border-color: transparent transparent #cbd5e1 transparent;
+    -fx-border-width: 0 0 2 0;
+    -fx-font-size: 15px;
+    -fx-padding: 12 15;
     -fx-text-fill: #0F172A;
 }
 
 .input-field:focused {
-    -fx-border-color: #F59E0B; /* Amber boja pri kucanju */
-    -fx-background-color: #F1F5F9;
+    -fx-background-color: #ffffff;
+    -fx-border-color: transparent transparent #F59E0B transparent;
+    -fx-effect: dropshadow(three-pass-box, rgba(245, 158, 11, 0.1), 10, 0, 0, 2);
 }
 
-/* DUGME - Moćan završetak */
+/* DUGME - "The Action Button" */
 .login-button {
     -fx-background-color: #0F172A;
-    -fx-text-fill: #F59E0B; /* Zlatni tekst na tamnoj pozadini */
-    -fx-font-family: "Segoe UI Black";
-    -fx-font-size: 16px;
-    -fx-background-radius: 0;
-    -fx-padding: 15;
+    -fx-text-fill: #F59E0B;
+    -fx-font-family: "Segoe UI Bold";
+    -fx-font-size: 15px;
+    -fx-background-radius: 8;
+    -fx-padding: 16;
     -fx-cursor: hand;
     -fx-border-color: #F59E0B;
     -fx-border-width: 1;
+    /* Glatki prelaz (JavaFX ne podržava tranzicije u CSS-u, ali boja i efekt čine svoje) */
 }
 
 .login-button:hover {
     -fx-background-color: #F59E0B;
     -fx-text-fill: #0F172A;
+    -fx-effect: dropshadow(three-pass-box, rgba(245, 158, 11, 0.4), 20, 0, 0, 0);
+}
+
+/* =========================================
+   DARK MODE - "Midnight Logistics" stil
+   ========================================= */
+
+.dark-mode .login-card {
+    -fx-background-color: #1E293B; /* Slate tamna */
+    -fx-border-color: rgba(255, 255, 255, 0.05);
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.7), 50, 0, 0, 25);
+}
+
+.dark-mode .brand-initials {
+    -fx-text-fill: #F8FAFC;
+}
+
+.dark-mode .input-label {
+    -fx-text-fill: #94A3B8;
+}
+
+.dark-mode .input-field {
+    -fx-background-color: #0F172A;
+    -fx-text-fill: white;
+    -fx-border-color: transparent transparent #334155 transparent;
+}
+
+.dark-mode .input-field:focused {
+    -fx-background-color: #1e293b;
+    -fx-border-color: transparent transparent #F59E0B transparent;
+}
+
+.dark-mode .login-button {
+    /* U tamnom modu dugme može biti još jače */
+    -fx-background-color: #F59E0B;
+    -fx-text-fill: #0F172A;
+}
+
+.dark-mode .login-button:hover {
+    -fx-background-color: transparent;
+    -fx-text-fill: #F59E0B;
+    -fx-border-color: #F59E0B;
 }

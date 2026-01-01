@@ -24,7 +24,6 @@ public class KamionDAO {
 
     public List<Kamion> findByVozacId(int vozacId) throws SQLException {
         List<Kamion> lista = new ArrayList<>();
-        // Mora biti zaduzeni_vozac_id prema tvojoj SQL šemi
         String query = "SELECT * FROM kamion WHERE zaduzeni_vozac_id = ? AND aktivan = TRUE";
 
         try (Connection conn = DatabaseConfig.getConnection();
@@ -32,10 +31,9 @@ public class KamionDAO {
             stmt.setInt(1, vozacId);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
-                Kamion k = new Kamion();
-                k.setId(rs.getInt("id"));
-                k.setRegistarska_tablica(rs.getString("registarska_tablica"));
-                lista.add(k);
+                // KLJUČNO: Koristimo mapResultSetToKamion koji smo već sredili
+                // On će ispravno pročitati 'ime_vozaca' i 'prezime_vozaca' iz baze
+                lista.add(mapResultSetToKamion(rs));
             }
         }
         return lista;
@@ -67,23 +65,45 @@ public class KamionDAO {
             stmt.executeUpdate();
         }
     }
+
     public void update(Kamion kamion) throws SQLException {
-        String query = "UPDATE kamion SET marka = ?, model = ?, registarska_tablica = ?, " +
-                "godina_proizvodnje = ?, kapacitet_tone = ?, stanje_kilometra = ?,  " +
-                "ime_vozaca = ?, prezime_vozaca = ? WHERE id = ?";
+        // POPRAVKA: Dodat datum_registracije i zaduzeni_vozac_id u query da bi se sve spasilo
+        String query = "UPDATE kamion SET registarska_tablica = ?, marka = ?, model = ?, " +
+                "godina_proizvodnje = ?, kapacitet_tone = ?, stanje_kilometra = ?, " +
+                "datum_registracije = ?, zaduzeni_vozac_id = ?, " +
+                "ime_vozaca = ?, prezime_vozaca = ? " +
+                "WHERE id = ?";
+
 
         try (Connection conn = DatabaseConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
 
-            stmt.setString(1, kamion.getMarka());
-            stmt.setString(2, kamion.getModel());
-            stmt.setString(3, kamion.getRegistarska_tablica());
+            stmt.setString(1, kamion.getRegistarska_tablica());
+            stmt.setString(2, kamion.getMarka());
+            stmt.setString(3, kamion.getModel());
             stmt.setInt(4, kamion.getGodina_proizvodnje());
             stmt.setDouble(5, kamion.getKapacitet_tone());
             stmt.setInt(6, kamion.getStanje_kilometra());
-            stmt.setString(7, kamion.getIme_vozaca());
-            stmt.setString(8, kamion.getPrezime_vozaca());
-            stmt.setInt(9, kamion.getId());
+
+            if (kamion.getDatum_registracije() != null) {
+                stmt.setDate(7, java.sql.Date.valueOf(kamion.getDatum_registracije()));
+            } else {
+                stmt.setNull(7, java.sql.Types.DATE);
+            }
+
+            // Zaduzeni vozac ID (Strani ključ)
+            if (kamion.getZaduzeni_vozac_id() != null && kamion.getZaduzeni_vozac_id() > 0) {
+                stmt.setInt(8, kamion.getZaduzeni_vozac_id());
+            } else {
+                stmt.setNull(8, java.sql.Types.INTEGER);
+            }
+
+            // Tekstualne kolone za ime/prezime (koje tvoj kontroler koristi za prikaz)
+            stmt.setString(9, kamion.getIme_vozaca());
+            stmt.setString(10, kamion.getPrezime_vozaca());
+
+            stmt.setInt(11, kamion.getId());
+
             stmt.executeUpdate();
         }
     }
@@ -107,18 +127,16 @@ public class KamionDAO {
         k.setGodina_proizvodnje(rs.getInt("godina_proizvodnje"));
         k.setKapacitet_tone(rs.getDouble("kapacitet_tone"));
         k.setStanje_kilometra(rs.getInt("stanje_kilometra"));
+
+        // Čitamo direktno iz kolona koje tvoja baza ima
         k.setIme_vozaca(rs.getString("ime_vozaca"));
         k.setPrezime_vozaca(rs.getString("prezime_vozaca"));
 
-        Date regDate = rs.getDate("datum_registracije");
-        if (regDate != null) {
-            k.setDatum_registracije(regDate.toLocalDate());
-        }
+        Date dReg = rs.getDate("datum_registracije");
+        if (dReg != null) k.setDatum_registracije(dReg.toLocalDate());
 
         int vId = rs.getInt("zaduzeni_vozac_id");
         k.setZaduzeni_vozac_id(rs.wasNull() ? null : vId);
-
-        k.setAktivan(rs.getBoolean("aktivan"));
 
         return k;
     }

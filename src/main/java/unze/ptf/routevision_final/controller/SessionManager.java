@@ -39,4 +39,14 @@ public class SessionManager {
         this.userRole = null;
         this.userId = 0;
     }
+    //anesa
+    private static boolean darkMode = false;
+
+    public static boolean isDarkMode() {
+        return darkMode;
+    }
+
+    public static void setDarkMode(boolean darkMode) {
+        SessionManager.darkMode = darkMode;
+    }
 }

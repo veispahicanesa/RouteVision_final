@@ -1,96 +1,149 @@
-/* GLAVNA POZADINA */
+/* ============================================================ */
+/* 1. LIGHT MODE (SREDNJE VELIČINE - ELEGANTNO)                 */
+/* ============================================================ */
+
 .root {
-    -fx-background-color: #0F172A;
+    -fx-background-color: #F8FAFC !important;
 }
 
-#mainContainer {
-    -fx-background-color: #0F172A;
+/* Fix za pozadinu (Scroll i glavni kontejner) */
+.management-container,
+#mainContainer,
+.anchor-pane,
+.scroll-pane,
+.scroll-pane > .viewport,
+.scroll-pane .content {
+    -fx-background-color: #F8FAFC !important;
+    -fx-background: #F8FAFC !important;
 }
 
-/* NASLOV - Steel Blue (ozbiljna plava, nije drečava) */
+/* SIDEBAR */
+.sidebar, #sideBar {
+    -fx-background-color: #FFFFFF !important;
+    -fx-border-color: transparent #E2E8F0 transparent transparent !important;
+    -fx-border-width: 0 1 0 0 !important;
+}
+
+/* --- OPTIMIZOVAN NASLOV --- */
 .title-label {
-    -fx-font-family: "Segoe UI Black";
-    -fx-font-size: 32px;
-    -fx-text-fill: #94A3B8;
-    -fx-padding: 0 0 15 0;
+    -fx-font-family: "Segoe UI Semibold";
+    -fx-font-size: 34px;               /* Smanjeno sa 42px na 34px */
+    -fx-text-fill: #1E293B;
+    -fx-padding: 10 0 15 0;
     -fx-border-color: transparent transparent #F59E0B transparent;
-    -fx-border-width: 0 0 2 0; /* Zlatna linija ispod naslova */
+    -fx-border-width: 0 0 4 0;
 }
 
-/* KARTICA SA PODACIMA */
+/* KARTICE */
 .info-section {
-    -fx-background-color: #1E293B;
-    -fx-background-radius: 10;
-    -fx-padding: 30;
-    -fx-border-color: rgba(255, 255, 255, 0.1);
-    -fx-border-width: 1;
+    -fx-background-color: #FFFFFF !important;
+    -fx-background-radius: 15;
+    -fx-border-color: #E2E8F0 !important;
+    -fx-border-radius: 15;
+    -fx-padding: 22;                  /* Manji padding za kompaktniji izgled */
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.06), 10, 0, 0, 4);
 }
 
-/* TEKST UNUTAR KARTICE */
+/* TEKST UNUTAR KARTICA */
 .section-title {
     -fx-font-family: "Segoe UI Bold";
-    -fx-font-size: 14px;
+    -fx-font-size: 15px;
     -fx-text-fill: #F59E0B;
-    -fx-text-transform: uppercase;
-    -fx-padding: 0 0 10 0;
 }
 
 .key-label {
-    -fx-font-family: "Segoe UI Semibold";
-    -fx-font-size: 13px;
     -fx-text-fill: #64748B;
+    -fx-font-size: 14px;
 }
 
 .value-label {
+    -fx-text-fill: #334155;
     -fx-font-family: "Segoe UI Bold";
     -fx-font-size: 16px;
-    -fx-text-fill: white;
 }
 
-/* --- DUGMAD (IDENTIČAN STIL ZA OBA) --- */
-.btn-edit, .btn-password {
+/* ============================================================ */
+/* 2. DUGMAD (SMANJENA I SREĐENA)                               */
+/* ============================================================ */
+
+.button {
+    -fx-background-radius: 12;
+    -fx-padding: 10 25;                /* Smanjeno sa 15 40 na 10 25 */
     -fx-font-family: "Segoe UI Bold";
-    -fx-font-size: 14px;
-    -fx-padding: 12 30;
-    -fx-background-radius: 5; /* Oba su sada blago zaobljena, identično */
-    -fx-border-radius: 5;
-    -fx-cursor: hand;
-    -fx-min-width: 180px; /* Da budu iste širine */
-}
-
-/* Glavno dugme (Zlatno) */
-.btn-edit {
-    -fx-background-color: #F59E0B;
-    -fx-text-fill: #0F172A;
-}
-
-.btn-edit:hover {
-    -fx-background-color: #D97706;
-}
-
-/* Sporedno dugme (Transparentno sa bijelim rubom) */
-.btn-password {
-    -fx-background-color: transparent;
+    -fx-font-size: 14px;               /* Smanjeno sa 16px na 14px */
     -fx-text-fill: white;
-    -fx-border-color: white;
-    -fx-border-width: 2;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.15), 8, 0, 0, 4);
 }
 
-.btn-password:hover {
-    -fx-background-color: rgba(255, 255, 255, 0.1);
+/* Gradijenti za dugmad */
+.btn-add, .btn-theme {
+    -fx-background-color: linear-gradient(to bottom right, #F59E0B, #D97706);
+    -fx-text-fill: white;
 }
 
-/* --- SKROL TRAKA --- */
-.scroll-pane {
+.btn-edit {
+    -fx-background-color: linear-gradient(to bottom right, #3B82F6, #1D4ED8);
+}
+
+.btn-delete, .btn-logout {
+    -fx-background-color: linear-gradient(to bottom right, #EF4444, #B91C1C);
+}
+
+.btn-refresh, .btn-password {
+    -fx-background-color: linear-gradient(to bottom right, #64748B, #334155);
+}
+
+/* Interakcije (Blaži efekti) */
+.button:hover {
+    -fx-translate-y: -2;              /* Blaži skok */
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.25), 10, 0, 0, 5);
+}
+
+.button:pressed {
+    -fx-scale-x: 0.96;
+    -fx-scale-y: 0.96;
+}
+
+/* ============================================================ */
+/* 3. DARK MODE (OSTALO ISTO)                                   */
+/* ============================================================ */
+
+.dark-mode.root,
+.dark-mode .management-container,
+.dark-mode #mainContainer,
+.dark-mode .scroll-pane,
+.dark-mode .scroll-pane > .viewport,
+.dark-mode .scroll-pane .content {
+    -fx-background-color: #0F172A !important;
+    -fx-background: #0F172A !important;
+}
+
+.dark-mode .sidebar, .dark-mode #sideBar {
+    -fx-background-color: #111827 !important;
+    -fx-border-color: transparent #1E293B transparent transparent !important;
+}
+
+.dark-mode .title-label {
+    -fx-text-fill: white !important;
+}
+
+.dark-mode .info-section {
+    -fx-background-color: #1E293B !important;
+    -fx-border-color: #334155 !important;
+}
+
+.dark-mode .value-label {
+    -fx-text-fill: #F1F5F9 !important;
+}
+
+/* Navigacija */
+.nav-button {
     -fx-background-color: transparent;
-    -fx-background: transparent;
+    -fx-text-fill: #475569;
+    -fx-font-size: 14px;
 }
 
-.scroll-pane .thumb {
-    -fx-background-color: #475569; /* Tamno siva traka da ne bode oči */
-    -fx-background-radius: 10;
-}
-
-.scroll-pane .track {
-    -fx-background-color: transparent;
+.dark-mode .nav-button {
+    -fx-text-fill: #94A3B8 !important;
 }

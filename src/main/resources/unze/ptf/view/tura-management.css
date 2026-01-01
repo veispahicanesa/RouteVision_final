@@ -1,62 +1,182 @@
-/* Glavni kontejner */
-.management-container {
-    -fx-background-color: #f4f7f6;
-}
-
-/* Naslov */
+/* ========================= */
+/*        NASLOV              */
+/* ========================= */
 .title-label {
-    -fx-font-size: 24px;
-    -fx-font-weight: bold;
-    -fx-text-fill: #2c3e50;
+    -fx-font-family: "Segoe UI Semibold";
+    -fx-font-size: 32px;
+    -fx-text-fill: #F59E0B;
+    -fx-padding: 10 0 20 0;
+    -fx-border-color: transparent transparent #F59E0B transparent;
+    -fx-border-width: 0 0 4 0;
+
 }
 
-.button-box {
-    -fx-padding: 5px 0px;
+.dark-mode .title-label {
+    -fx-text-fill: white !important;
 }
 
-/* Zajednički stil za gumbe */
-.button {
-    -fx-text-fill: white;
-    -fx-padding: 10 20;
-    -fx-font-size: 12px;
-    -fx-font-weight: bold;
-    -fx-cursor: hand;
-    -fx-background-radius: 3px;
+/* ========================= */
+/*        KONTEJNER           */
+/* ========================= */
+.management-container {
+    -fx-padding: 25;
+    -fx-background-color: #F8FAFC;
 }
 
-/* Dugme: Završi Turu (Zeleno kao btn-paid/btn-add) */
-.btn-complete {
-    -fx-background-color: #2ecc71;
-}
-.btn-complete:hover {
-    -fx-background-color: #27ae60;
+.dark-mode .management-container {
+    -fx-background-color: #0F172A !important;
 }
 
-/* Dugme: Osvježi (Sivo) */
-.btn-refresh {
-    -fx-background-color: #95a5a6;
-}
-.btn-refresh:hover {
-    -fx-background-color: #7f8c8d;
-}
-.btn-status-blue { -fx-background-color: #3498db; -fx-text-fill: white; }
-.btn-status-green { -fx-background-color: #2ecc71; -fx-text-fill: white; }
-.btn-status-red { -fx-background-color: #e67e22; -fx-text-fill: white; } /* Narandžasto-crvena */
-
-.btn-status-blue:hover, .btn-status-green:hover, .btn-status-red:hover {
-    -fx-opacity: 0.8;
-}
-/* Tabela */
+/* ========================= */
+/*        TABLE VIEW          */
+/* ========================= */
 .table-view {
+    -fx-background-color: transparent;
+    -fx-background-radius: 20;
+    -fx-border-radius: 20;
+    -fx-border-width: 1;
+    -fx-border-color: #E2E8F0;
+    -fx-background-insets: 0;
+    -fx-padding: 1;
+}
+
+.dark-mode .table-view {
+    -fx-border-color: #334155 !important;
+}
+
+/* ========================= */
+/*    HEADER POZADINA         */
+/* ========================= */
+.table-view .column-header-background {
+    -fx-background-color: #F1F5F9;
+    -fx-background-radius: 20 20 0 0;
+    -fx-background-insets: 0 1 0 1;
+}
+
+.dark-mode .table-view .column-header-background {
+    -fx-background-color: #111827 !important;
+}
+
+/* ========================= */
+/*        HEADER TEXT         */
+/* ========================= */
+.table-view .column-header,
+.table-view .filler {
+    -fx-background-color: transparent;
+    -fx-border-width: 0;
+}
+
+.table-view .column-header .label {
+    -fx-text-fill: #1E293B;
+    -fx-font-family: "Segoe UI Semibold";
+}
+
+.dark-mode .table-view .column-header .label {
+    -fx-text-fill: #E5E7EB !important;
+}
+
+/* ========================= */
+/*      DONJI DIO TABELE      */
+/* ========================= */
+.table-view .virtual-flow {
     -fx-background-color: white;
-    -fx-background-radius: 5px;
-    -fx-border-color: #dcdde1;
+    -fx-background-radius: 0 0 20 20;
+    -fx-padding: 0;
 }
 
-.table-view .column-header {
-    -fx-background-color: #f8f9fa;
-    -fx-padding: 10px;
-    -fx-border-color: transparent transparent #dcdde1 transparent;
+.dark-mode .table-view .virtual-flow {
+    -fx-background-color: #1E293B !important;
 }
 
-/* Stil za status 'ZAVRŠENO' unutar tabele bi se mogao dodati preko CellFactory-a u Javi */
+/* ========================= */
+/*       REDOVI I CELIJE      */
+/* ========================= */
+.table-row-cell {
+    -fx-background-color: transparent;
+}
+
+.table-row-cell:filled:hover {
+    -fx-background-color: rgba(100, 116, 139, 0.15);
+}
+
+.dark-mode .table-row-cell:filled:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.05);
+}
+
+.table-cell {
+    -fx-text-fill: #1E293B;
+    -fx-padding: 12;
+    -fx-border-color: transparent;
+}
+
+.dark-mode .table-cell {
+    -fx-text-fill: #F1F5F9 !important;
+}
+
+/* ========================= */
+/*       CORNER FIX           */
+/* ========================= */
+.table-view .corner {
+    -fx-background-color: transparent;
+    -fx-background-radius: 20;
+}
+
+/* ========================= */
+/*       DUGMAD               */
+/* ========================= */
+.button {
+    -fx-background-radius: 12;
+    -fx-padding: 12 25;
+    -fx-font-family: "Segoe UI Bold";
+    -fx-text-fill: white;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.15), 8, 0, 0, 4);
+}
+
+.btn-add {
+    -fx-background-color: linear-gradient(to bottom right, #F59E0B, #B45309);
+    -fx-text-fill: #0F172A;
+}
+
+.btn-status-red {
+    -fx-background-color: linear-gradient(to bottom right, #3B82F6, #1D4ED8);
+}
+
+.btn-delete{
+    -fx-background-color: linear-gradient(to bottom right, #EF4444, #B91C1C);
+}
+
+.btn-refresh {
+    -fx-background-color: linear-gradient(to bottom right, #64748B, #334155);
+}
+.btn-status-blue{
+    -fx-background-color: linear-gradient(to bottom right, #4F46E5, #3730A3);
+}
+.btn-status-green{
+    -fx-background-color: linear-gradient(to bottom right, #10B981, #047857);
+    -fx-text-fill: white;
+}
+
+.button:hover {
+    -fx-translate-y: -3;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 12, 0, 0, 6);
+}
+
+.button:pressed {
+    -fx-scale-x: 0.95;
+    -fx-scale-y: 0.95;
+}
+
+/* ========================= */
+/*   DARK MODE SHADOW BONUS   */
+/* ========================= */
+.dark-mode .table-view {
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.6), 14, 0, 0, 6);
+}
+.table-view .scroll-bar:vertical {
+    -fx-padding: 4 6 4 0;
+}
+
+.table-view .scroll-bar:horizontal {
+    -fx-padding: 0 4 6 4;
+}

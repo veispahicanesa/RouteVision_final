@@ -1,81 +1,121 @@
-/* Glavni prozor */
+/* --- OSNOVNE VARIJABLE --- */
 .root {
-    -fx-bg-main: #F1F5F9; /* Ledeno bijela pozadina (nema sive!) */
-    -fx-sidebar-bg: #0F172A; /* Duboka Ocean plava */
-    -fx-amber: #F59E0B; /* Zlatni akcenti */
+    -fx-p-bg: #F1F5F9;
+    -fx-s-bg: #FFFFFF;
+    -fx-side-bg: #0F172A;
+    -fx-m-text: #1E293B;
+    -fx-mut-text: #64748B;
+    -fx-acc: #F59E0B;
+    -fx-bord: #E2E8F0;
 }
 
-/* SIDEBAR - Lijevi meni */
-.sidebar {
-    -fx-background-color: -fx-sidebar-bg;
-    -fx-min-width: 280px;
-    -fx-padding: 0;
+/* DARK MODE - Koristimo specifičnija imena varijabli da izbjegnemo konflikt */
+.root.dark-mode {
+    -fx-p-bg: #0B1222;
+    -fx-s-bg: #111827;
+    -fx-m-text: #F8FAFC;
+    -fx-mut-text: #94A3B8;
+    -fx-bord: #1F2937;
 }
 
-/* HEADER - Gornja traka */
+/* --- FIX ZA HEADER (Izbačene varijable iz efekata) --- */
 .header-bar {
-    -fx-background-color: #FFFFFF;
-    -fx-padding: 15 30;
-    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 2);
-    -fx-border-color: #E2E8F0;
+    -fx-background-color: -fx-s-bg;
+    -fx-border-color: -fx-bord;
     -fx-border-width: 0 0 1 0;
+    -fx-padding: 0 30;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 4);
 }
 
-/* NASLOVI U HEADERU - Sada se vide kristalno jasno */
+.dark-mode .header-bar {
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.5), 10, 0, 0, 4);
+}
+
+/* --- SIDEBAR & CONTENT --- */
+.sidebar {
+    -fx-background-color: -fx-side-bg;
+    -fx-padding: 25 15;
+    -fx-spacing: 10;
+}
+
+.content-pane {
+    -fx-background-color: -fx-p-bg;
+}
+
+/* --- TEKST --- */
 .brand-name-top {
     -fx-font-family: "Segoe UI Black";
-    -fx-font-size: 26px;
-    -fx-text-fill: #0F172A; /* Tamna plava na bijeloj pozadini */
+    -fx-font-size: 24px;
+    -fx-text-fill: -fx-m-text;
 }
 
-.brand-name-sub-top {
+.welcome-text {
+    -fx-font-family: "Segoe UI Black";
+    -fx-font-size: 32px;
+    -fx-text-fill: -fx-m-text;
+}
+
+
+#btnTheme {
+    /* Koristimo direktne boje umjesto varijabli koje se mogu ciklično pozivati */
+    -fx-background-color: #F59E0B;
+    -fx-text-fill: #0F172A;
+    -fx-background-radius: 20;
     -fx-font-family: "Segoe UI Bold";
-    -fx-font-size: 13px;
-    -fx-text-fill: -fx-amber;
-    -fx-letter-spacing: 4px;
+    -fx-cursor: hand;
+    -fx-padding: 8 15;
 }
 
-/* DUGMAD U MENIJU */
+.dark-mode #btnTheme {
+    -fx-background-color: #1E293B;
+    -fx-text-fill: #F59E0B;
+    -fx-background-radius: 20;
+    -fx-border-color: #F59E0B;
+
+}
+
 .menu-button {
     -fx-background-color: transparent;
     -fx-text-fill: #94A3B8;
     -fx-font-family: "Segoe UI Bold";
-    -fx-font-size: 15px;
-    -fx-padding: 16 25;
-    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 15 20;
+    -fx-background-radius: 10;
     -fx-cursor: hand;
-    -fx-background-radius: 0;
+    -fx-alignment: CENTER_LEFT;
 }
 
 .menu-button:hover {
     -fx-background-color: rgba(255, 255, 255, 0.05);
     -fx-text-fill: white;
+    -fx-background-radius: 20;
 }
-
-/* Aktivno dugme - Amber indikator sa lijeve strane */
-.menu-button:selected, .menu-button:focused {
-    -fx-background-color: rgba(245, 158, 11, 0.1);
-    -fx-text-fill: -fx-amber;
-    -fx-border-color: transparent transparent transparent -fx-amber;
-    -fx-border-width: 0 0 0 5;
-}
-
-/* KARTICE U CENTRALNOM DIJELU */
-.content-pane {
-    -fx-background-color: -fx-bg-main;
-    -fx-padding: 40;
-}
-
-.table-card {
-    -fx-background-color: white;
-    -fx-background-radius: 12;
-    -fx-padding: 25;
-    -fx-effect: dropshadow(three-pass-box, rgba(15, 23, 42, 0.08), 25, 0, 0, 10);
-}
-
-/* KORISNIČKI LABEL U HEADERU */
-.user-label {
-    -fx-font-family: "Segoe UI Semibold";
+/* --- ODJAVA DUGME (Premium Style) --- */
+.logout-button {
+    -fx-background-color: rgba(239, 68, 68, 0.1); /* Blaga crvena providna pozadina */
+    -fx-text-fill: #EF4444;                        /* Jaka crvena boja teksta */
+    -fx-font-family: "Segoe UI Bold";
     -fx-font-size: 14px;
-    -fx-text-fill: #475569;
+    -fx-padding: 12 20;
+    -fx-background-radius: 10;
+    -fx-border-color: rgba(239, 68, 68, 0.3);
+    -fx-border-width: 1;
+    -fx-border-radius: 10;
+    -fx-cursor: hand;
+    -fx-alignment: CENTER_LEFT;
+    -fx-transition: all 0.3s;
+}
+
+.logout-button:hover {
+    -fx-background-color: #EF4444;                 /* Puna crvena na hover */
+    -fx-text-fill: white;                          /* Bijeli tekst na hover */
+    -fx-effect: dropshadow(three-pass-box, rgba(239, 68, 68, 0.4), 10, 0, 0, 0);
+}
+
+/* Ikona unutar dugmeta (ako koristiš Ikonli ili Glyph) */
+.logout-button .ikonli-font-icon {
+    -fx-icon-color: #EF4444;
+}
+
+.logout-button:hover .ikonli-font-icon {
+    -fx-icon-color: white;
 }

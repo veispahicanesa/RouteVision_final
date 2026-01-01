@@ -4,7 +4,10 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import unze.ptf.routevision_final.controller.SessionManager;
+
 import java.io.IOException;
+
 
 public class HelloApplication extends Application {
 
@@ -20,13 +23,13 @@ public class HelloApplication extends Application {
                 HelloApplication.class.getResource("/unze/ptf/view/LoginView.fxml")
         );
 
-        // Ispravljeno: koristimo 'loader' (ne fxmlLoader)
-        // Uklonjene su fiksne dimenzije (320x240) da bi se prozor prilagodio dizajnu iz FXML-a
+
         Scene scene = new Scene(loader.load());
 
         stage.setTitle("RouteVision - Prijava");
         stage.setScene(scene);
-        stage.setResizable(false);
+        stage.setResizable(true);
+        stage.setMaximized(true);
         stage.show();
     }
 
@@ -36,5 +39,25 @@ public class HelloApplication extends Application {
 
     public static void main(String[] args) {
         launch(args);
+    }
+
+
+
+    //anesa
+    public static void applyTheme(Scene scene) {
+        if (scene == null) return;
+
+        // Dohvatamo root element (to je tvoj BorderPane iz FXML-a)
+        var root = scene.getRoot();
+
+        if (SessionManager.isDarkMode()) {
+            // Dodajemo klasu 'dark-mode' ako je Dark Mode aktivan
+            if (!root.getStyleClass().contains("dark-mode")) {
+                root.getStyleClass().add("dark-mode");
+            }
+        } else {
+            // Brišemo je ako nije
+            root.getStyleClass().remove("dark-mode");
+        }
     }
 }

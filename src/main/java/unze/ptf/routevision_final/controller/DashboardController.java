@@ -9,6 +9,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import unze.ptf.routevision_final.HelloApplication;
 import unze.ptf.routevision_final.model.Admin;
 import unze.ptf.routevision_final.model.Vozac;
 
@@ -20,13 +21,17 @@ public class DashboardController {
     @FXML private VBox sideMenu;
     @FXML private VBox contentArea;
     @FXML private Label userLabel;
-
+    private boolean isDark = true;
+    @FXML private Button btnTheme;
     private SessionManager sessionManager = SessionManager.getInstance();
 
     @FXML
     public void initialize() {
         setupUserHeader();
         createDynamicMenu();
+        if (btnTheme != null) {
+            btnTheme.setText(SessionManager.isDarkMode() ? "SVIJETLI MOD" : "TAMNI MOD");
+        }
     }
 
     private void setupUserHeader() {
@@ -42,13 +47,32 @@ public class DashboardController {
         }
         userLabel.setText("Korisnik: " + userName + " (" + userRole + ")");
     }
+    @FXML
+    private void handleHome() {
+        // Čistimo trenutni sadržaj da bi se vidio početni pozdrav
+        contentArea.getChildren().clear();
 
+        // Ovdje možeš ili učitati poseban HomeView.fxml
+        // loadView("HomeView.fxml");
+
+        // Ili jednostavno dodati početne labele nazad ako nemaš poseban FXML
+        Label welcome = new Label("Dobrodošli u RouteVision");
+        welcome.getStyleClass().add("welcome-text"); // Dodaj ovaj stil u CSS
+
+        Label subtext = new Label("Odaberite opciju iz menija sa lijeve strane.");
+        subtext.getStyleClass().add("sub-welcome-text");
+
+        contentArea.getChildren().addAll(welcome, subtext);
+    }
     private void createDynamicMenu() {
         String userRole = sessionManager.getUserRole();
         sideMenu.getChildren().clear();
-
+        Button homeBtn = createMenuBtn("POČETNA STRANA", e -> handleHome());
+        homeBtn.getStyleClass().add("menu-button-home"); // Poseban stil za Home
+        sideMenu.getChildren().add(homeBtn);
         if ("Admin".equals(userRole)) {
             sideMenu.getChildren().addAll(
+
                     createMenuBtn("Profil", e -> showProfile()),
                     createMenuBtn("Administratori", e -> showAdmini()),
                     createMenuBtn("Vozači", e -> showVozaci()),
@@ -74,11 +98,13 @@ public class DashboardController {
         Button btn = new Button(text);
         btn.getStyleClass().add("menu-button");
         btn.setMaxWidth(Double.MAX_VALUE);
+        btn.setAlignment(javafx.geometry.Pos.CENTER_LEFT); // Poravnanje lijevo
+        btn.setPadding(new javafx.geometry.Insets(15, 20, 15, 20));
         btn.setOnAction(event);
         return btn;
     }
 
-    // --- METODE ZA UCITAVANJE VIEW-OVA ---
+
 
     private void loadView(String fxmlFile) {
         try {
@@ -142,5 +168,27 @@ public class DashboardController {
     }
     private void showAdmini() {
         loadView("admin-list.fxml");
+    }
+
+
+    //anesa
+    // Dodaj ovu varijablu na vrh klase (ispod userLabel)
+    @FXML
+    private void toggleTheme() {
+        isDark = !isDark;
+
+        // Dohvatamo ROOT cijele scene
+        Parent root = rootLayout.getScene().getRoot();
+
+        if (isDark) {
+            root.getStyleClass().add("dark-mode");
+            // Također dodajemo na contentArea za svaki slučaj
+            contentArea.getStyleClass().add("dark-mode");
+            btnTheme.setText("SVIJETLI MOD");
+        } else {
+            root.getStyleClass().remove("dark-mode");
+            contentArea.getStyleClass().remove("dark-mode");
+            btnTheme.setText("TAMNI MOD");
+        }
     }
 }

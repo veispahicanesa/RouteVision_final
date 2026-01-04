@@ -63,6 +63,7 @@ public class LoginController {
                     Stage stage = new Stage();
                     stage.setScene(new Scene(root));
                     stage.setTitle("RouteVision - Dashboard");
+                    stage.setMaximized(true);
                     stage.show();
 
                     // Zatvaranje Login prozora

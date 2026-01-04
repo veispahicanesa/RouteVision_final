@@ -7,6 +7,7 @@ import javafx.scene.Scene;
 import javafx.scene.chart.PieChart;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -79,10 +80,11 @@ public class DashboardController {
             double troskovi = dao.getTroskoviServisa() + dao.getTroskoviPlata();
             double profit = prihodi - troskovi;
 
-            javafx.scene.layout.HBox mainLayout = new javafx.scene.layout.HBox(40);
-            javafx.scene.layout.VBox cardsSide = new javafx.scene.layout.VBox(20);
+            javafx.scene.layout.HBox mainLayout = new javafx.scene.layout.HBox(50); // Veći razmak (50)
+            mainLayout.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+            mainLayout.setPadding(new javafx.geometry.Insets(10, 0, 10, 0));
 
-            // KARTICE
+            javafx.scene.layout.VBox cardsSide = new javafx.scene.layout.VBox(20);
             cardsSide.getChildren().addAll(
                     createStatCard("UKUPNI PRIHODI", String.format("%.2f KM", prihodi), "#27ae60"),
                     createStatCard("UKUPNI TROŠKOVI", String.format("%.2f KM", troskovi), "#e67e22"),
@@ -94,16 +96,27 @@ public class DashboardController {
             PieChart.Data slicePrihod = new PieChart.Data("Prihodi", prihodi);
             PieChart.Data sliceTrosak = new PieChart.Data("Troškovi", troskovi);
             pieChart.getData().addAll(slicePrihod, sliceTrosak);
-            pieChart.setPrefSize(400, 400);
-
+            pieChart.setPrefSize(500, 400);
             mainLayout.getChildren().addAll(cardsSide, pieChart);
-
+            javafx.scene.layout.HBox.setHgrow(pieChart, javafx.scene.layout.Priority.ALWAYS);
             // DUGME
-            Button btnExport = new Button("EKSPORTUJ FINANSIJSKI IZVJEŠTAJ (PDF)");
-            btnExport.setStyle("-fx-background-color: #f39c12; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 20; -fx-cursor: hand;");
-            btnExport.setOnAction(e -> generateAdminPDF());
+            Button btnExport = new Button("📥 GENERIŠI FINANSIJSKI IZVJEŠTAJ (PDF)");
+            btnExport.setStyle(
+                    "-fx-background-color: linear-gradient(to bottom, #f39c12, #d35400);" +
+                            "-fx-text-fill: white;" +
+                            "-fx-font-size: 15px;" +
+                            "-fx-font-weight: bold;" +
+                            "-fx-padding: 12 30;" +
+                            "-fx-background-radius: 30;" + // Zaobljeno dugme
+                            "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 10, 0, 0, 5);" +
+                            "-fx-cursor: hand;"
+            );
 
-            // DODAVANJE U CONTENT (Samo jednom dodajemo sve elemente)
+            // Hover efekat za dugme
+            btnExport.setOnMouseEntered(e -> btnExport.setStyle(btnExport.getStyle() + "-fx-background-color: linear-gradient(to bottom, #e67e22, #a04000);"));
+            btnExport.setOnMouseExited(e -> btnExport.setStyle(btnExport.getStyle() + "-fx-background-color: linear-gradient(to bottom, #f39c12, #d35400);"));
+
+            btnExport.setOnAction(e -> generateAdminPDF());
             contentArea.getChildren().addAll(mainLayout, btnExport);
 
             // BOJENJE (Jedan Platform.runLater je dovoljan)
@@ -122,9 +135,81 @@ public class DashboardController {
             });
 
         } else {
+            // --- POČETNA STRANA ZA VOZAČA ---
+            Vozac trenutniVozac = (Vozac) sessionManager.getCurrentUser();
+            boolean darkAktiviran = SessionManager.isDarkMode();
+            // 1. Dinamičke boje na osnovu teme (isDark)
+            String dynamicTextColor = darkAktiviran ? "#FFFFFF" : "#2c3e50";
+            String dynamicPanelColor = darkAktiviran ? "#2c3e50" : "#FFFFFF";
+            String dynamicSubText = darkAktiviran ? "#bdc3c7" : "#7f8c8d";
+
+            // 2. Naslov i dobrodošlica
+            VBox welcomePanel = new VBox(10);
+            Label lblMain = new Label("Dobrodošli nazad, " + trenutniVozac.getIme() + "!");
+            // Popravljamo boju naslova za tamni mod
+            lblMain.setStyle("-fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: " + dynamicTextColor + ";");
+            welcomePanel.getChildren().add(lblMain);
+
+
+            // 3. Statističke kartice
             javafx.scene.layout.HBox driverCards = new javafx.scene.layout.HBox(20);
-            driverCards.getChildren().add(createStatCard("MOJE TURE", "2", "#8e44ad"));
-            contentArea.getChildren().add(driverCards);
+            driverCards.getChildren().addAll(
+                    createStatCard("MOJE TURE", String.valueOf(trenutniVozac.getBroj_dovrsenih_tura()), "#8e44ad"),
+                    createStatCard("STATUS VOZILA", "ISPRAVNO", "#27ae60"),
+                    createStatCard("AKTIVNA PLATA", String.format("%.2f KM", trenutniVozac.getPlata()), "#2980b9")
+            );
+
+
+            // 4. Progress Bar sekcija
+            VBox progressBox = new VBox(8);
+            progressBox.setPadding(new javafx.geometry.Insets(10, 0, 10, 0));
+
+            int brojTura = trenutniVozac.getBroj_dovrsenih_tura();
+            int cilj = 10;
+            double procenat = (double) brojTura / cilj;
+
+            Label lblProgress = new Label();
+            ProgressBar pb = new ProgressBar();
+            pb.setPrefWidth(600);
+
+            if (brojTura >= cilj) {
+                lblProgress.setText("ČESTITAMO! Bonus ostvaren (" + brojTura + "/" + cilj + " tura)");
+                lblProgress.setStyle("-fx-font-weight: bold; -fx-text-fill: #27ae60; -fx-font-size: 14px;");
+                pb.setProgress(1.0);
+                pb.setStyle("-fx-accent: #27ae60;");
+            } else {
+                lblProgress.setText("Napredak do bonusa: još " + (cilj - brojTura) + " ture do cilja");
+                // I ovdje koristimo dynamicTextColor da se vidi u mraku
+                lblProgress.setStyle("-fx-font-weight: bold; -fx-text-fill: " + dynamicTextColor + "; -fx-font-size: 14px;");
+                pb.setProgress(procenat);
+                pb.setStyle("-fx-accent: #6c5ce7;");
+            }
+            progressBox.getChildren().addAll(lblProgress, pb);
+
+            // 5. KREIRANJE DUGMETA (Mora biti prije actionPanel.getChildren().add)
+            Button btnPdf = new Button("PREUZMI MOJ KARTON (PDF)");
+            btnPdf.setStyle("-fx-background-color: #6c5ce7; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-padding: 12 25; -fx-background-radius: 10; -fx-cursor: hand;");
+            btnPdf.setOnAction(e -> handleGenerateMyDriverPDF(trenutniVozac));
+
+            VBox actionPanel = new VBox(20);
+            actionPanel.setAlignment(javafx.geometry.Pos.CENTER);
+            actionPanel.setPadding(new javafx.geometry.Insets(30));
+            actionPanel.setMaxWidth(800); // Da ne bude razvučen preko cijelog ekrana
+
+            actionPanel.setStyle("-fx-background-color: " + dynamicPanelColor + "; " +
+                    "-fx-background-radius: 15; " +
+                    "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.4), 15, 0, 0, 0);");
+
+            Label lblQuestion = new Label("Trebate službeni dokument?");
+            lblQuestion.setStyle("-fx-text-fill: " + dynamicTextColor + "; -fx-font-size: 16px; -fx-font-weight: bold;");
+
+            Label lblInfo = new Label("Generišite PDF karton sa vašim podacima.");
+            lblInfo.setStyle("-fx-text-fill: " + dynamicSubText + "; -fx-font-size: 13px;");
+
+            actionPanel.getChildren().addAll(lblQuestion, lblInfo, btnPdf);
+            // 7. DODAVANJE SVEGA U CONTENT AREA REDOM
+            contentArea.getChildren().clear(); // Očistimo za svaki slučaj prije dodavanja
+            contentArea.getChildren().addAll(welcomePanel, driverCards, progressBox, actionPanel);
         }
     }
 
@@ -268,25 +353,24 @@ public class DashboardController {
     }
 
 
-    //anesa
-    // Dodaj ovu varijablu na vrh klase (ispod userLabel)
     @FXML
     private void toggleTheme() {
         isDark = !isDark;
+        SessionManager.getInstance().setDarkMode(isDark);
 
-        // Dohvatamo ROOT cijele scene
+        // 1. Primijeni stil na glavni prozor
         Parent root = rootLayout.getScene().getRoot();
-
         if (isDark) {
-            root.getStyleClass().add("dark-mode");
-            // Također dodajemo na contentArea za svaki slučaj
-            contentArea.getStyleClass().add("dark-mode");
+            if (!root.getStyleClass().contains("dark-mode")) {
+                root.getStyleClass().add("dark-mode");
+            }
             btnTheme.setText("SVIJETLI MOD");
         } else {
             root.getStyleClass().remove("dark-mode");
-            contentArea.getStyleClass().remove("dark-mode");
             btnTheme.setText("TAMNI MOD");
         }
+
+
     }
 
     private void generateAdminPDF() {
@@ -405,7 +489,47 @@ public class DashboardController {
             byte[] bytes = is.readAllBytes();
             return "data:image/png;base64," + java.util.Base64.getEncoder().encodeToString(bytes);
         } catch (Exception e) {
-            return ""; // U slučaju greške vraća prazno
+            return "";
+        }
+    }
+    private void handleGenerateMyDriverPDF(Vozac vozac) {
+        try {
+            PdfService pdfService = new PdfService();
+            String html = pdfService.loadHtmlTemplate("vozac_karton.html");
+            String tacnoVrijeme = java.time.LocalDateTime.now()
+                    .format(java.time.format.DateTimeFormatter.ofPattern("dd.MM.yyyy. HH:mm:ss"));
+            String qrPodaci = "RouteVision - Službena Potvrda\n" +
+                    "Vozač: " + vozac.getIme() + " " + vozac.getPrezime() + "\n" +
+                    "ID Dozvole: " + vozac.getBroj_vozacke_dozvole() + "\n" +
+                    "Kategorija: " + vozac.getKategorija_dozvole() + "\n" +
+                    "Status: Aktivan zaposlenik";
+            String qrCodeBase = getQRCodeBase64(qrPodaci);
+            String napomena = (vozac.getBroj_dovrsenih_tura() >= 10)
+                    ? "KVALIFIKOVAN ZA MJESEČNI BONUS"
+                    : "REDOVAN RADNI STATUS";
+
+            html = html.replace("{{ime_prezime}}", vozac.getIme() + " " + vozac.getPrezime())
+                    .replace("{{email}}", vozac.getEmail())
+                    .replace("{{telefon}}", vozac.getBroj_telefona() != null ? vozac.getBroj_telefona() : "N/A")
+                    .replace("{{dozvola}}", vozac.getBroj_vozacke_dozvole())
+                    .replace("{{kategorija}}", vozac.getKategorija_dozvole() != null ? vozac.getKategorija_dozvole() : "N/A")
+                    .replace("{{plata}}", String.format("%.2f KM", vozac.getPlata()))
+                    .replace("{{ture}}", String.valueOf(vozac.getBroj_dovrsenih_tura()))
+                    .replace("{{qr_code_base64}}", qrCodeBase)
+                    .replace("{{napomena}}", napomena)
+                    .replace("{{vrijeme}}", tacnoVrijeme);
+
+            String putanja = System.getProperty("user.home") + File.separator + "Desktop" + File.separator + "Moj_Izvjestaj.pdf";
+            pdfService.generateReport(putanja, html);
+
+            javafx.scene.control.Alert alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.INFORMATION);
+            alert.setTitle("Uspjeh");
+            alert.setHeaderText(null);
+            alert.setContentText("Vaš karton je generisan na Desktopu!");
+            alert.showAndWait();
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

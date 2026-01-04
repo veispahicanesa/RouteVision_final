@@ -69,6 +69,24 @@
             color: #95a5a6;
             margin-top: 10px;
         }
+
+        .qr-code {
+            position: absolute;
+            bottom: 20px;    /* Pomjera ga skroz na dno stranice */
+            right: 20px;     /* Pomjera ga u desni ćošak */
+            text-align: center;
+        }
+
+        .qr-code img {
+            width: 70px;     /* Smanjili smo ga malo da ne smeta */
+            height: 70px;
+        }
+        .qr-text {
+            font-size: 8px;
+            color: #888;
+            margin-top: 5px;
+        }
+
     </style>
 </head>
 <body>
@@ -123,13 +141,30 @@
         <td>Aktivan zaposlenik</td>
     </tr>
 </table>
-
 <div class="footer">
     <div class="timestamp">Dokument generisan: {{vrijeme}}</div>
-    <div class="signature-box">
-        Potpis odgovorne osobe
-    </div>
+
+    <table style="border: none; margin-top: 30px; width: 100%;">
+        <tr>
+            <td style="border: none; background: none; width: 50%; text-align: left; vertical-align: bottom; padding: 0;">
+                <div style="text-align: center; width: 80px;">
+                    <img src="{{qr_code_base64}}" style="width: 80px; height: 80px; border: 1px solid #eee;"/>
+                    <div style="font-size: 8px; color: #888; margin-top: 5px;">SISTEMSKA VERIFIKACIJA</div>
+                </div>
+            </td>
+
+            <td style="border: none; background: none; width: 50%; text-align: right; vertical-align: bottom; padding: 0;">
+                <div style="display: inline-block; text-align: center;">
+                    <div style="border-top: 1px solid #000; width: 200px; padding-top: 5px; margin-bottom: 5px;">
+                        Potpis odgovorne osobe
+                    </div>
+                    <div style="font-size: 10px; color: #95a5a6;">HN LOGISTICS D.O.O.</div>
+                </div>
+            </td>
+        </tr>
+    </table>
 </div>
 
 </body>
 </html>
+

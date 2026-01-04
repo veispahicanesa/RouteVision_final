@@ -353,4 +353,5 @@ public class ProfileController {
         alert.setContentText(message);
         alert.showAndWait();
     }
+
 }

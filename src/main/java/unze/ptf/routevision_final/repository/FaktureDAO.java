@@ -155,4 +155,35 @@ public class FaktureDAO {
 
         return f;
     }
+    public double getUkupniPrihodi() {
+        String sql = "SELECT SUM(ukupan_iznos) FROM fakture WHERE status_placanja = 'Plaćeno' OR status_placanja = 'U obradi'";
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) return rs.getDouble(1);
+        } catch (SQLException e) { e.printStackTrace(); }
+        return 0;
+    }
+
+    public double getTroskoviServisa() {
+        String sql = "SELECT SUM(troskovi) FROM servisni_dnevnik";
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) return rs.getDouble(1);
+        } catch (SQLException e) { e.printStackTrace(); }
+        return 0;
+    }
+
+    public double getTroskoviPlata() {
+        // Sabiramo plate i admina i vozača
+        String sql = "SELECT (SELECT SUM(plata) FROM admin) + (SELECT SUM(plata) FROM vozac)";
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) return rs.getDouble(1);
+        } catch (SQLException e) { e.printStackTrace(); }
+        return 0;
+    }
+
 }

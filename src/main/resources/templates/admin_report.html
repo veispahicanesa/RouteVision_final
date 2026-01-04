@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="bs" lang="bs">
+<head>
+    <title>Finansijski Izvještaj</title>
+    <style type="text/css">
+        /* <![CDATA[ */
+        @page { size: A4; margin: 1cm 1.5cm; }
+        body { font-family: "Arial", sans-serif; color: #2c3e50; font-size: 11px; margin: 0; padding: 0; line-height: 1.5; }
+
+        .header-table { width: 100%; border-bottom: 3px solid #34495e; margin-bottom: 30px; }
+        .header-table td { border: none; padding-bottom: 15px; }
+
+        .kpi-container { background-color: #fcfcfc; padding: 20px; border: 1px solid #e1e8ed; margin-bottom: 30px; border-radius: 8px; }
+        .kpi-table { width: 100%; border: none; }
+        .kpi-table td { border: none; padding: 0 15px; vertical-align: top; }
+
+        .main-table { width: 100%; border-collapse: collapse; margin-bottom: 25px; }
+        .main-table th { background-color: #34495e; color: #ffffff; padding: 12px; text-align: left; }
+        .main-table td { padding: 12px; border-bottom: 1px solid #edf2f7; }
+        .total-row { background-color: #f8fafc; font-weight: bold; font-size: 13px; }
+
+        .status-box { padding: 8px 15px; color: #ffffff; border-radius: 5px; display: inline-block; margin-top: 10px; text-transform: uppercase; }
+
+        .pdv-section { text-align: right; margin-top: 15px; padding-top: 15px; border-top: 2px solid #34495e; }
+        .explanation-box { background-color: #fff9f0; padding: 15px; border-left: 6px solid #f39c12; margin: 25px 0; }
+
+        .signature-section { page-break-inside: avoid; margin-top: 30px; }
+        .signature-table { width: 100%; }
+        .signature-table td { border: none; vertical-align: bottom; }
+        .signature-line { border-bottom: 1px solid #2c3e50; width: 220px; margin-bottom: 8px; }
+
+        .footer { font-size: 9px; color: #95a5a6; text-align: center; margin-top: 40px; border-top: 1px solid #eee; padding-top: 15px; }
+        /* ]]> */
+    </style>
+</head>
+<body>
+
+<table class="header-table">
+    <tr>
+        <td style="width: 65%;">
+            <div style="font-size: 26px; font-weight: bold; color: #1a2a3a;">HN LOGISTICS</div>
+            <div style="font-size: 10px; color: #7f8c8d; margin-top: 8px;">
+                ID: 4200000000000 | PDV: 200000000000 <br/>
+                Adresa: Ulica Alije Izetbegovića L3, Kakanj
+            </div>
+        </td>
+        <td style="width: 35%; text-align: right;">
+            <div style="font-size: 16px; font-weight: bold;">FINANSIJSKI IZVJEŠTAJ</div>
+            <div style="margin-top: 8px; color: #34495e;">Datum: {{datum}}</div>
+            <div {{stil_boje}} class="status-box">{{status_tekst}}</div>
+        </td>
+    </tr>
+</table>
+
+<div class="kpi-container">
+    <table class="kpi-table">
+        <tr>
+            <td style="width: 50%; border-right: 2px solid #edf2f7;">
+                <div style="color: #3498db; font-weight: bold; margin-bottom: 10px; font-size: 12px;">1. OPERATIVNI RESURSI</div>
+                <div style="margin-bottom: 4px;">Aktivna vozila: <strong>{{aktivna_vozila}}</strong></div>
+                <div style="margin-bottom: 4px;">Ukupna kilometraža: <strong>{{ukupni_km}} km</strong></div>
+                <div style="margin-bottom: 4px;">Prosječna potrošnja: <strong>{{potrosnja}} L/100</strong></div>
+                <div>Zarada po km: <strong>{{prihod_po_km}} KM</strong></div>
+            </td>
+            <td style="width: 50%; padding-left: 30px;">
+                <div style="color: #3498db; font-weight: bold; margin-bottom: 10px; font-size: 12px;">2. ANALIZA KLIJENATA</div>
+                <div style="font-size: 10px; line-height: 1.8; color: #34495e;">
+                    {{top_klijenti}}
+                </div>
+                <div style="margin-top: 15px; border-top: 1px dashed #eee; padding-top: 5px;">
+                    Prosječan prihod/tura: <strong>{{avg_prihod}} KM</strong>
+                </div>
+            </td>
+        </tr>
+    </table>
+</div>
+
+<table class="main-table">
+    <thead>
+    <tr>
+        <th style="width: 40%;">Kategorija troška/prihoda</th>
+        <th style="width: 40%;">Opis stavke</th>
+        <th style="text-align: right; width: 20%;">Iznos (KM)</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td>Prihodi od prodaje</td>
+        <td>Ukupna naplata transporta</td>
+        <td style="text-align: right;">{{prihodi}}</td>
+    </tr>
+    <tr>
+        <td>Varijabilni troškovi</td>
+        <td>Gorivo, putarine i dnevnice</td>
+        <td style="text-align: right;">{{varijabilni_troskovi}}</td>
+    </tr>
+    <tr>
+        <td>Fiksni troškovi</td>
+        <td>Plate osoblja i najam</td>
+        <td style="text-align: right;">{{troskovi_plate}}</td>
+    </tr>
+    <tr>
+        <td>Održavanje voznog parka</td>
+        <td>Servisiranje i rezervni dijelovi</td>
+        <td style="text-align: right;">{{troskovi_servis}}</td>
+    </tr>
+    <tr class="total-row">
+        <td colspan="2">NETO POSLOVNI REZULTAT (PROFIT)</td>
+        <td {{stil_profita}}>{{profit}} KM</td>
+    </tr>
+    </tbody>
+</table>
+
+<div class="pdv-section">
+    <div style="color: #7f8c8d;">Osnovica: {{osnovica}} KM | PDV (17%): {{iznos_pdv}} KM</div>
+    <div style="font-size: 16px; margin-top: 8px; color: #1a2a3a;"><strong>UKUPNA VRIJEDNOST: {{prihodi}} KM</strong></div>
+</div>
+
+<div class="signature-section">
+    <div class="explanation-box">
+        <div style="font-weight: bold; margin-bottom: 8px; color: #d35400;">Sistemsko obrazloženje:</div>
+        {{objasnjenje}}
+    </div>
+
+    <table class="signature-table">
+        <tr>
+            <td style="width: 60%;">
+                <div style="margin-bottom: 50px;">Odgovorno lice:</div>
+                <div class="signature-line"></div>
+                <div style="font-weight: bold; font-size: 13px;">{{korisnik}}</div>
+            </td>
+            <td style="width: 40%; text-align: right;">
+                <div style="display: inline-block; text-align: center;">
+                    <img src="{{qr_code_base64}}"
+                         alt="QR" style="width: 100px; height: 100px; border: 1px solid #eee;"/>
+                    <div style="margin-top: 8px; font-weight: bold; font-size: 10px;">M.P. Verifikovano</div>
+                </div>
+            </td>
+        </tr>
+    </table>
+</div>
+
+<div class="footer">
+    Dokument je automatski generisan putem HN Logistics sistema<br/>
+    Vrijeme generisanja: {{vrijeme}} | Stranica 1 od 1
+</div>
+
+</body>
+</html>

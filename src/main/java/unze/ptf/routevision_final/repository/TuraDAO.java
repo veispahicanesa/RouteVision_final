@@ -137,4 +137,77 @@ public class TuraDAO {
 
         return t;
     }
+    // Metoda za prebrojavanje aktivnih tura (za KPI - Prosjek po turi)
+    public int countAktivneTure() throws SQLException {
+        String query = "SELECT COUNT(*) FROM tura WHERE aktivan = TRUE";
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query);
+             ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        }
+        return 0;
+    }
+
+    // Metoda za ukupnu kilometražu (za KPI - Trošak po kilometru)
+    public int getUkupniKilometri() throws SQLException {
+        String query = "SELECT SUM(prijedeni_kilometri) FROM tura WHERE aktivan = TRUE";
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query);
+             ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        }
+        return 0;
+    }
+    // Za Tačku 1: Ukupna potrošnja goriva
+    public double getUkupnaPotrosnjaGoriva() throws SQLException {
+        String query = "SELECT SUM(fuel_used) FROM tura WHERE aktivan = TRUE";
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query);
+             ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) {
+                return rs.getDouble(1);
+            }
+        }
+        return 0;
+    }
+
+    // Za Tačku 1: Broj različitih kamiona koji su bili u pokretu
+    public int getBrojAktivnihVozila() throws SQLException {
+        String query = "SELECT COUNT(DISTINCT kamion_id) FROM tura WHERE aktivan = TRUE";
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query);
+             ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        }
+        return 0;
+    }
+
+    public List<String> getTopKlijenti() throws SQLException {
+        List<String> klijenti = new ArrayList<>();
+
+        // SQL upit prilagođen tvojoj šemi (fakture + klijent)
+        String query = "SELECT k.naziv_firme, SUM(f.ukupan_iznos) as ukupno " +
+                "FROM fakture f " +
+                "JOIN klijent k ON f.klijent_id = k.id " +
+                "GROUP BY k.naziv_firme " +
+                "ORDER BY ukupno DESC LIMIT 3";
+
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                String klijent = rs.getString("naziv_firme");
+                double iznos = rs.getDouble("ukupno");
+                klijenti.add(klijent + ": " + String.format("%.2f", iznos) + " KM");
+            }
+        }
+        return klijenti;
+    }
 }

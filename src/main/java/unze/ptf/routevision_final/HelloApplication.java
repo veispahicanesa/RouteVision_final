@@ -1,5 +1,6 @@
 package unze.ptf.routevision_final;
 
+import com.dlsc.formsfx.model.structure.Element;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -49,6 +50,7 @@ public class HelloApplication extends Application {
 
         // Dohvatamo root element (to je tvoj BorderPane iz FXML-a)
         var root = scene.getRoot();
+
 
         if (SessionManager.isDarkMode()) {
             // Dodajemo klasu 'dark-mode' ako je Dark Mode aktivan

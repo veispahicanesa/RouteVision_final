@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Karton Vozača</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 40px;
+            color: #2c3e50;
+        }
+        .header {
+            border-bottom: 3px solid #6c5ce7;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .company-name {
+            font-size: 28px;
+            font-weight: bold;
+            color: #6c5ce7;
+        }
+        .document-title {
+            font-size: 18px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: 5px;
+        }
+        .section-title {
+            background-color: #f3f0ff;
+            color: #6c5ce7;
+            padding: 10px;
+            font-weight: bold;
+            margin-top: 20px;
+            border-left: 5px solid #6c5ce7;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        table td {
+            padding: 12px;
+            border: 1px solid #eee;
+            font-size: 14px;
+        }
+        .label {
+            font-weight: bold;
+            width: 35%;
+            background-color: #fafafa;
+        }
+        .footer {
+            margin-top: 60px;
+            border-top: 1px solid #eee;
+            padding-top: 20px;
+        }
+        .signature-box {
+            float: right;
+            width: 200px;
+            text-align: center;
+            border-top: 1px solid #000;
+            margin-top: 40px;
+            font-size: 12px;
+        }
+        .timestamp {
+            font-size: 10px;
+            color: #95a5a6;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <div>
+        <div class="company-name">HN LOGISTICS</div>
+        <div class="document-title">Službeni karton vozača</div>
+    </div>
+</div>
+
+<div class="section-title">LIČNI PODACI</div>
+<table>
+    <tr>
+        <td class="label">Ime i prezime:</td>
+        <td>{{ime_prezime}}</td>
+    </tr>
+    <tr>
+        <td class="label">E-mail adresa:</td>
+        <td>{{email}}</td>
+    </tr>
+    <tr>
+        <td class="label">Kontakt telefon:</td>
+        <td>{{telefon}}</td>
+    </tr>
+</table>
+
+<div class="section-title">KVALIFIKACIJE I RADNI STATUS</div>
+<table>
+    <tr>
+        <td class="label">Broj vozačke dozvole:</td>
+        <td>{{dozvola}}</td>
+    </tr>
+    <tr>
+        <td class="label">Kategorija:</td>
+        <td>{{kategorija}}</td>
+    </tr>
+    <tr>
+        <td class="label">Dogovorena mjesečna plata:</td>
+        <td><strong>{{plata}}</strong></td>
+    </tr>
+</table>
+
+<div class="section-title">EVIDENCIJA RADA</div>
+<table>
+    <tr>
+        <td class="label">Ukupno završenih tura:</td>
+        <td>{{ture}}</td>
+    </tr>
+    <tr>
+        <td class="label">Status u sistemu:</td>
+        <td>Aktivan zaposlenik</td>
+    </tr>
+</table>
+
+<div class="footer">
+    <div class="timestamp">Dokument generisan: {{vrijeme}}</div>
+    <div class="signature-box">
+        Potpis odgovorne osobe
+    </div>
+</div>
+
+</body>
+</html>

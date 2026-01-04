@@ -87,4 +87,5 @@ public class Fakture {
 
     public LocalDateTime getDatum_kreiranja() { return datum_kreiranja; }
     public void setDatum_kreiranja(LocalDateTime datum_kreiranja) { this.datum_kreiranja = datum_kreiranja; }
+
 }

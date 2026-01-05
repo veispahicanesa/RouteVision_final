@@ -22,6 +22,7 @@ public class KamionDAO {
         return kamioni;
     }
 
+
     public List<Kamion> findByVozacId(int vozacId) throws SQLException {
         List<Kamion> lista = new ArrayList<>();
         String query = "SELECT * FROM kamion WHERE zaduzeni_vozac_id = ? AND aktivan = TRUE";

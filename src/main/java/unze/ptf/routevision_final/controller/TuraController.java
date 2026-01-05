@@ -8,9 +8,13 @@ import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
+import unze.ptf.routevision_final.model.Kamion;
 import unze.ptf.routevision_final.model.Tura;
+import unze.ptf.routevision_final.model.Vozac;
+import unze.ptf.routevision_final.repository.KamionDAO;
 import unze.ptf.routevision_final.repository.TuraDAO;
 import unze.ptf.routevision_final.controller.SessionManager;
+import unze.ptf.routevision_final.repository.VozacDAO;
 
 import java.sql.SQLException;
 import java.time.Duration;
@@ -31,8 +35,11 @@ public class TuraController {
     @FXML private TableColumn<Tura, Double> gorivoCol; // Nova kolona
     @FXML private TableColumn<Tura, String> statusCol;
     @FXML private Button btnDelete;
-
+    @FXML private Button btnAddTura;
     private TuraDAO turaDAO = new TuraDAO();
+    @FXML private Button btnEditTura;
+    @FXML private TableColumn<Tura, String> vozacCol;
+    @FXML private TableColumn<Tura, String> kamionCol;
 
     @FXML
     public void initialize() {
@@ -41,11 +48,15 @@ public class TuraController {
 
         if (SessionManager.getInstance() != null) {
             String role = SessionManager.getInstance().getUserRole();
-            if (!"Admin".equals(role) && btnDelete != null) {
-                btnDelete.setVisible(false);
-            }
+            boolean isAdmin = "Admin".equals(role);
+
+            if (btnDelete != null) btnDelete.setVisible(isAdmin);
+            if (btnEditTura != null) btnEditTura.setVisible(isAdmin);
+            if (btnAddTura != null) btnAddTura.setVisible(isAdmin); // Vozač ne vidi "Nova tura"
         }
     }
+    private VozacDAO vozacDAO = new VozacDAO();
+    private KamionDAO kamionDAO = new KamionDAO();
 
     private void setupColumns() {
         // 1. Kolona za broj ture
@@ -95,7 +106,35 @@ public class TuraController {
                 }
             }
         });
+        vozacCol.setCellValueFactory(c -> {
+            int id = c.getValue().getVozac_id();
+            try {
+                Vozac v = vozacDAO.findById(id); // Koristimo vašu metodu iz VozacDAO
+                if (v != null) {
+                    return new SimpleStringProperty(v.getIme() + " " + v.getPrezime());
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            return new SimpleStringProperty("Nepoznat (" + id + ")");
+        });
 
+        // 2. Kolona za Kamion - pretvaranje ID-a u Registraciju
+        kamionCol.setCellValueFactory(c -> {
+            int id = c.getValue().getKamion_id();
+            try {
+                // Pronađite kamion po ID-u (provjerite imate li findById u KamionDAO)
+                // Ako nemate findById, možemo koristiti findAll i filtrirati
+                List<Kamion> svi = kamionDAO.findAll();
+                Optional<Kamion> k = svi.stream().filter(kam -> kam.getId() == id).findFirst();
+                if (k.isPresent()) {
+                    return new SimpleStringProperty(k.get().getRegistarska_tablica());
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            return new SimpleStringProperty("ID: " + id);
+        });
         // 7. Kolona za status
         statusCol.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getStatus()));
     }
@@ -103,14 +142,11 @@ public class TuraController {
 
     private void loadData() {
         try {
-            if (SessionManager.getInstance() == null) return;
-            String role = SessionManager.getInstance().getUserRole();
-            int userId = SessionManager.getInstance().getUserId();
-
-            List<Tura> listaTura = "Admin".equals(role) ? turaDAO.findAll() : turaDAO.findByVozacId(userId);
-            tableView.setItems(FXCollections.observableArrayList(listaTura));
+            List<Tura> svjezeTure = turaDAO.findAll();
+            tableView.getItems().clear(); // POTPUNO OBRIŠI TRENUTNI PRIKAZ
+            tableView.getItems().addAll(svjezeTure); // DODAJ SVE PONOVO KAO NOVE STAVKE
         } catch (SQLException e) {
-            showAlert("Greška", "Nije moguće učitati ture.");
+            showAlert("Greška", "Učitavanje neuspješno.");
         }
     }
 
@@ -205,5 +241,225 @@ public class TuraController {
         alert.setTitle(title);
         alert.setContentText(message);
         alert.showAndWait();
+    }
+    @FXML
+    private void handlePrikaziFormuZaDodavanje() {
+        Dialog<Tura> dialog = new Dialog<>();
+        dialog.setTitle("Dodjeljivanje nove ture");
+        dialog.setHeaderText("Unesite detalje za novu turu");
+
+        ButtonType spremiButtonType = new ButtonType("Kreiraj", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(spremiButtonType, ButtonType.CANCEL);
+
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(20, 150, 10, 10));
+
+        // Osnovna polja
+        TextField brojTure = new TextField();
+        TextField polaziste = new TextField();
+        TextField odrediste = new TextField();
+        DatePicker datum = new DatePicker(LocalDate.now());
+
+        // Novo: Polje za vrijeme (podrazumijevano trenutno vrijeme)
+        TextField vrijemeField = new TextField(LocalTime.now().format(java.time.format.DateTimeFormatter.ofPattern("HH:mm")));
+        vrijemeField.setPromptText("HH:mm");
+
+        // Novo: Status (podrazumijevano "U toku" ili "Novo" prema tvojoj slici)
+        ComboBox<String> comboStatus = new ComboBox<>(FXCollections.observableArrayList("Novo", "U toku", "Završena"));
+        comboStatus.setValue("Novo");
+
+        // ComboBox-ovi za odabir vozača i kamiona
+        ComboBox<Vozac> comboVozaci = new ComboBox<>();
+        ComboBox<Kamion> comboKamioni = new ComboBox<>();
+
+        try {
+            comboVozaci.setItems(FXCollections.observableArrayList(vozacDAO.findAll()));
+            comboKamioni.setItems(FXCollections.observableArrayList(kamionDAO.findAll()));
+
+            // Postavljanje prikaza imena i registracija
+            comboVozaci.setConverter(new javafx.util.StringConverter<>() {
+                @Override public String toString(Vozac v) { return v == null ? "" : v.getIme() + " " + v.getPrezime(); }
+                @Override public Vozac fromString(String s) { return null; }
+            });
+
+            comboKamioni.setConverter(new javafx.util.StringConverter<>() {
+                @Override public String toString(Kamion k) { return k == null ? "" : k.getRegistarska_tablica() + " (" + k.getMarka() + ")"; }
+                @Override public Kamion fromString(String s) { return null; }
+            });
+        } catch (SQLException e) { e.printStackTrace(); }
+
+        grid.add(new Label("Broj ture:"), 0, 0);
+        grid.add(brojTure, 1, 0);
+        grid.add(new Label("Polazište:"), 0, 1);
+        grid.add(polaziste, 1, 1);
+        grid.add(new Label("Odredište:"), 0, 2);
+        grid.add(odrediste, 1, 2);
+        grid.add(new Label("Datum:"), 0, 3);
+        grid.add(datum, 1, 3);
+        grid.add(new Label("Vrijeme:"), 0, 4);
+        grid.add(vrijemeField, 1, 4);
+        grid.add(new Label("Vozač:"), 0, 5);
+        grid.add(comboVozaci, 1, 5);
+        grid.add(new Label("Kamion:"), 0, 6);
+        grid.add(comboKamioni, 1, 6);
+        grid.add(new Label("Status:"), 0, 7);
+        grid.add(comboStatus, 1, 7);
+
+        dialog.getDialogPane().setContent(grid);
+
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == spremiButtonType) {
+                try {
+                    Tura n = new Tura();
+                    n.setBroj_tura(brojTure.getText());
+                    n.setLokacija_pocetka(polaziste.getText());
+                    n.setLokacija_kraja(odrediste.getText());
+                    n.setDatum_pocetka(datum.getValue());
+                    n.setVrijeme_pocetka(LocalTime.parse(vrijemeField.getText()));
+                    n.setVozac_id(comboVozaci.getValue().getId());
+                    n.setKamion_id(comboKamioni.getValue().getId());
+                    n.setStatus(comboStatus.getValue());
+                    n.setAktivan(true);
+
+                    // Početni kilometri su 0, gorivo se računa tek kad se tura završi
+                    n.setPrijedeni_kilometri(0);
+                    n.setSpent_fuel(0.0);
+                    n.setFuel_used(0.0);
+
+                    if(SessionManager.getInstance() != null) {
+                        n.setKreirao_admin_id(String.valueOf(SessionManager.getInstance().getUserId()));
+                    }
+                    return n;
+                } catch (Exception e) {
+                    showAlert("Greška", "Provjerite unos podataka (Vrijeme mora biti u formatu HH:mm)");
+                    return null;
+                }
+            }
+            return null;
+        });
+
+        Optional<Tura> result = dialog.showAndWait();
+        result.ifPresent(novaTura -> {
+            try {
+                turaDAO.save(novaTura);
+                loadData();
+                showAlert("Uspjeh", "Tura je uspješno kreirana!");
+            } catch (SQLException e) {
+                showAlert("Greška", "Problem sa bazom: " + e.getMessage());
+            }
+        });
+    }
+    @FXML
+    private void handleEditTura() {
+        Tura odabranaTura = tableView.getSelectionModel().getSelectedItem();
+        if (odabranaTura == null) {
+            showAlert("Upozorenje", "Molimo odaberite turu koju želite urediti.");
+            return;
+        }
+
+        Dialog<Tura> dialog = new Dialog<>();
+        dialog.setTitle("Uređivanje ture");
+        dialog.setHeaderText("Izmjena podataka za: " + odabranaTura.getBroj_tura());
+
+        ButtonType spremiButtonType = new ButtonType("Sačuvaj", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(spremiButtonType, ButtonType.CANCEL);
+
+        GridPane grid = new GridPane();
+        grid.setHgap(10); grid.setVgap(10);
+        grid.setPadding(new Insets(20, 150, 10, 10));
+
+        TextField polaziste = new TextField(odabranaTura.getLokacija_pocetka());
+        TextField odrediste = new TextField(odabranaTura.getLokacija_kraja());
+
+        // Provjera da li je vrijeme null prije toString()
+        String trenutnoVrijeme = odabranaTura.getVrijeme_pocetka() != null ? odabranaTura.getVrijeme_pocetka().toString() : "08:00";
+        TextField vrijemeField = new TextField(trenutnoVrijeme);
+
+        ComboBox<Vozac> comboVozaci = new ComboBox<>();
+        ComboBox<Kamion> comboKamioni = new ComboBox<>();
+        ComboBox<String> comboStatus = new ComboBox<>(FXCollections.observableArrayList("Novo", "U toku", "Završena", "Prekinuta"));
+        comboStatus.setValue(odabranaTura.getStatus());
+
+        try {
+            // Punjenje vozača
+            List<Vozac> sviVozaci = vozacDAO.findAll();
+            comboVozaci.setItems(FXCollections.observableArrayList(sviVozaci));
+            comboVozaci.setConverter(new javafx.util.StringConverter<Vozac>() {
+                @Override public String toString(Vozac v) { return v == null ? "" : v.getIme() + " " + v.getPrezime(); }
+                @Override public Vozac fromString(String s) { return null; }
+            });
+            sviVozaci.stream().filter(v -> v.getId() == odabranaTura.getVozac_id()).findFirst().ifPresent(comboVozaci::setValue);
+
+            // Punjenje kamiona
+            List<Kamion> sviKamioni = kamionDAO.findAll();
+            comboKamioni.setItems(FXCollections.observableArrayList(sviKamioni));
+            comboKamioni.setConverter(new javafx.util.StringConverter<Kamion>() {
+                @Override public String toString(Kamion k) { return k == null ? "" : k.getRegistarska_tablica() + " (" + k.getMarka() + ")"; }
+                @Override public Kamion fromString(String s) { return null; }
+            });
+            sviKamioni.stream().filter(k -> k.getId() == odabranaTura.getKamion_id()).findFirst().ifPresent(comboKamioni::setValue);
+
+        } catch (Exception e) {
+            System.out.println("Greška pri punjenju combo boxova: " + e.getMessage());
+        }
+
+        grid.add(new Label("Polazište:"), 0, 0);
+        grid.add(polaziste, 1, 0);
+        grid.add(new Label("Odredište:"), 0, 1);
+        grid.add(odrediste, 1, 1);
+        grid.add(new Label("Vrijeme:"), 0, 2);
+        grid.add(vrijemeField, 1, 2);
+        grid.add(new Label("Vozač:"), 0, 3);
+        grid.add(comboVozaci, 1, 3);
+        grid.add(new Label("Kamion:"), 0, 4);
+        grid.add(comboKamioni, 1, 4);
+        grid.add(new Label("Status:"), 0, 5);
+        grid.add(comboStatus, 1, 5);
+
+        dialog.getDialogPane().setContent(grid);
+
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == spremiButtonType) {
+                try {
+                    odabranaTura.setLokacija_pocetka(polaziste.getText());
+                    odabranaTura.setLokacija_kraja(odrediste.getText());
+                    odabranaTura.setVrijeme_pocetka(LocalTime.parse(vrijemeField.getText()));
+
+                    if (comboVozaci.getValue() != null) odabranaTura.setVozac_id(comboVozaci.getValue().getId());
+                    if (comboKamioni.getValue() != null) odabranaTura.setKamion_id(comboKamioni.getValue().getId());
+
+                    odabranaTura.setStatus(comboStatus.getValue());
+                    return odabranaTura;
+                } catch (Exception e) {
+                    // Ako vrijeme nije HH:mm, ovdje će puknuti
+                    System.out.println("Greška u konverziji podataka: " + e.getMessage());
+                    return null;
+                }
+            }
+            return null;
+        });
+
+        Optional<Tura> result = dialog.showAndWait();
+        if (result.isPresent()) {
+            try {
+                // 1. Ažuriraj bazu
+                turaDAO.update(result.get());
+
+                // 2. KLJUČNO: Moramo reći tabeli da su podaci "prljavi" i da ih ponovo pročita
+                // Prvo pozovemo loadData da dobijemo novu listu iz baze
+                loadData();
+
+                // 3. Forsiramo UI refresh na dva nivoa
+                tableView.getColumns().get(0).setVisible(false); // Mali trik za resetovanje renderera
+                tableView.getColumns().get(0).setVisible(true);
+                tableView.refresh();
+
+                showAlert("Uspjeh", "Tura je izmijenjena i prikaz osvježen!");
+            } catch (SQLException e) {
+                showAlert("Greška", "Baza: " + e.getMessage());
+            }
+        }
     }
 }

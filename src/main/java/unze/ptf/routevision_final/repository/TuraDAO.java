@@ -8,17 +8,14 @@ import java.util.List;
 
 public class TuraDAO {
 
-    // 1. Pronalaženje svih tura (za ADMINA)
     public List<Tura> findAll() throws SQLException {
         List<Tura> ture = new ArrayList<>();
-        String query = "SELECT * FROM tura WHERE aktivan = TRUE ORDER BY datum_kreiranja DESC";
-
+        String query = "SELECT * FROM tura WHERE aktivan = TRUE";
         try (Connection conn = DatabaseConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query);
              ResultSet rs = stmt.executeQuery()) {
-
             while (rs.next()) {
-                ture.add(mapResultSetToTura(rs));
+                ture.add(mapResultSetToTura(rs)); // mapResultSetToTura MORA kreirati novi Tura()
             }
         }
         return ture;
@@ -71,7 +68,10 @@ public class TuraDAO {
 
 
     public void update(Tura tura) throws SQLException {
-        String query = "UPDATE tura SET status = ?, prijedeni_kilometri = ?, prosjecna_brzina = ?, datum_kraja = ?, vrijeme_kraja = ?, spent_fuel = ?, fuel_used = ?, napomena = ? WHERE id = ?";
+        String query = "UPDATE tura SET status = ?, prijedeni_kilometri = ?, prosjecna_brzina = ?, " +
+                "datum_kraja = ?, vrijeme_kraja = ?, spent_fuel = ?, fuel_used = ?, " +
+                "lokacija_pocetka = ?, lokacija_kraja = ?, vrijeme_pocetka = ?, " +
+                "vozac_id = ?, kamion_id = ? WHERE id = ?";
 
         try (Connection conn = DatabaseConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
@@ -79,12 +79,16 @@ public class TuraDAO {
             stmt.setString(1, tura.getStatus());
             stmt.setInt(2, tura.getPrijedeni_kilometri());
             stmt.setInt(3, tura.getProsjecna_brzina());
-            stmt.setDate(4, tura.getDatum_kraja() != null ? Date.valueOf(tura.getDatum_kraja()) : Date.valueOf(java.time.LocalDate.now()));
-            stmt.setTime(5, tura.getVrijeme_kraja() != null ? Time.valueOf(tura.getVrijeme_kraja()) : Time.valueOf(java.time.LocalTime.now()));
+            stmt.setDate(4, tura.getDatum_kraja() != null ? Date.valueOf(tura.getDatum_kraja()) : null);
+            stmt.setTime(5, tura.getVrijeme_kraja() != null ? Time.valueOf(tura.getVrijeme_kraja()) : null);
             stmt.setDouble(6, tura.getSpent_fuel());
             stmt.setDouble(7, tura.getFuel_used());
-            stmt.setString(8, tura.getNapomena());
-            stmt.setInt(9, tura.getId());
+            stmt.setString(8, tura.getLokacija_pocetka());
+            stmt.setString(9, tura.getLokacija_kraja());
+            stmt.setTime(10, Time.valueOf(tura.getVrijeme_pocetka()));
+            stmt.setInt(11, tura.getVozac_id());
+            stmt.setInt(12, tura.getKamion_id());
+            stmt.setInt(13, tura.getId());
 
             stmt.executeUpdate();
         }
@@ -92,7 +96,8 @@ public class TuraDAO {
 
 
     public void delete(int id) throws SQLException {
-        String query = "UPDATE tura SET aktivan = FALSE WHERE id = ?";
+        // Fizičko brisanje reda iz tabele tura
+        String query = "DELETE FROM tura WHERE id = ?";
         try (Connection conn = DatabaseConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setInt(1, id);

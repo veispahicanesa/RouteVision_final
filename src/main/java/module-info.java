@@ -15,6 +15,7 @@ module unze.ptf.routevision_final {
     requires openhtmltopdf.core;
     requires openhtmltopdf.pdfbox;
 
+
     // 1. Dozvoljava pristup glavnoj aplikaciji (HelloApplication)
     opens unze.ptf.routevision_final to javafx.fxml;
 

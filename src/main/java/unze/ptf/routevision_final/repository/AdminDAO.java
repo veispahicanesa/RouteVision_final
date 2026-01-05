@@ -121,8 +121,8 @@ public class AdminDAO {
     }
 
     public void delete(int id) throws SQLException {
-        // Radimo soft delete (samo gasimo korisnika, ne brišemo red iz baze skroz)
-        String query = "UPDATE admin SET aktivan = FALSE WHERE id = ?";
+        // "Hard delete" - briše red iz baze podataka u potpunosti
+        String query = "DELETE FROM admin WHERE id = ?";
         try (Connection conn = DatabaseConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setInt(1, id);

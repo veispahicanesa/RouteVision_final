@@ -12,6 +12,9 @@
 
         <HBox spacing="10.0" styleClass="button-box" alignment="CENTER_LEFT">
             <children>
+                <Button fx:id="btnAddTura" onAction="#handlePrikaziFormuZaDodavanje" styleClass="btn-status-green" text="➕ Nova tura" />
+                <Separator orientation="VERTICAL" />
+                <Button fx:id="btnEditTura" onAction="#handleEditTura" styleClass="btn-status-blue" text="📝 Uredi" />
                 <Button onAction="#handleRefresh" styleClass="btn-refresh" text="Osvježi" />
                 <Separator orientation="VERTICAL" />
                 <Button onAction="#handleStatusInProgress" styleClass="btn-status-blue" text="U toku" />
@@ -27,7 +30,8 @@
                 <TableColumn fx:id="brojCol" prefWidth="100.0" text="Broj Ture" />
                 <TableColumn fx:id="relacijaCol" prefWidth="200.0" text="Relacija (Od -> Do)" />
                 <TableColumn fx:id="datumCol" prefWidth="100.0" text="Datum" />
-
+                <TableColumn fx:id="vozacCol" prefWidth="120.0" text="Vozač" />
+                <TableColumn fx:id="kamionCol" prefWidth="100.0" text="Kamion" />
                 <TableColumn fx:id="vrijemeCol" prefWidth="80.0" text="Vrijeme" />
 
                 <TableColumn fx:id="kmCol" prefWidth="80.0" text="KM" />

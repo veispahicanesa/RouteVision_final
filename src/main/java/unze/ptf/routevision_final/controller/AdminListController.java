@@ -30,14 +30,27 @@ public class AdminListController {
 
     @FXML
     public void initialize() {
-        setupTableColumns();
-        loadAdminData();
+        setupTableColumns(); // Poziva podešavanja kolona
+        loadAdminData();     // Učitava podatke iz DAO
     }
 
     @FXML private TableColumn<Admin, String> datumZaposlenjaCol;
 
     private void setupTableColumns() {
-        idCol.setCellValueFactory(data -> new SimpleIntegerProperty(data.getValue().getId()).asObject());
+
+        idCol.setCellFactory(column -> new TableCell<Admin, Integer>() {
+            @Override
+            protected void updateItem(Integer item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty) {
+                    setText(null);
+                } else {
+                    // getIndex() daje poziciju u trenutnom prikazu tabele
+                    // Dodajemo 1 jer indeksi kreću od 0
+                    setText(String.valueOf(getIndex() + 1));
+                }
+            }
+        });
         imeCol.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getIme()));
         prezimeCol.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getPrezime()));
         emailCol.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getEmail()));

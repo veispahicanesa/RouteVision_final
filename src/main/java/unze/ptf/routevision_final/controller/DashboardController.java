@@ -136,11 +136,19 @@ public class DashboardController {
         } else {
             // --- POČETNA STRANA ZA VOZAČA ---
             Vozac trenutniVozac = (Vozac) sessionManager.getCurrentUser();
+            TuraDAO turaDAO = new TuraDAO();
+
+            // 1. Povlačenje svježih podataka isključivo za ulogovanog vozača
+            int stvaranBrojTura = 0;
+            try {
+                // Ovo filtrira ture u bazi prema ID-u vozača iz sesije
+                stvaranBrojTura = turaDAO.findByVozacId(trenutniVozac.getId()).size();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
             boolean darkAktiviran = SessionManager.isDarkMode();
-            // 1. Dinamičke boje na osnovu teme (isDark)
             String dynamicTextColor = darkAktiviran ? "#FFFFFF" : "#2c3e50";
-            String dynamicPanelColor = darkAktiviran ? "#2c3e50" : "#FFFFFF";
-            String dynamicSubText = darkAktiviran ? "#bdc3c7" : "#7f8c8d";
 
             // 2. Naslov i dobrodošlica
             VBox welcomePanel = new VBox(10);
@@ -148,68 +156,59 @@ public class DashboardController {
             lblMain.setStyle("-fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: -fx-m-text;");
             welcomePanel.getChildren().add(lblMain);
 
-
-
-            // 3. Statističke kartice
+            // 3. Statističke kartice - KORISTIMO stvaranBrojTura
             javafx.scene.layout.HBox driverCards = new javafx.scene.layout.HBox(20);
             driverCards.getChildren().addAll(
-                    createStatCard("MOJE TURE", String.valueOf(trenutniVozac.getBroj_dovrsenih_tura()), "#8e44ad"),
+                    createStatCard("MOJE TURE", String.valueOf(stvaranBrojTura), "#8e44ad"),
                     createStatCard("STATUS VOZILA", "ISPRAVNO", "#27ae60"),
                     createStatCard("AKTIVNA PLATA", String.format("%.2f KM", trenutniVozac.getPlata()), "#2980b9")
             );
 
-
-            // 4. Progress Bar sekcija
+            // 4. Progress Bar sekcija - KORISTIMO stvaranBrojTura
             VBox progressBox = new VBox(8);
             progressBox.setPadding(new javafx.geometry.Insets(10, 0, 10, 0));
 
-            int brojTura = trenutniVozac.getBroj_dovrsenih_tura();
             int cilj = 10;
-            double procenat = (double) brojTura / cilj;
+            double procenat = (double) stvaranBrojTura / cilj;
 
             Label lblProgress = new Label();
             ProgressBar pb = new ProgressBar();
             pb.setPrefWidth(600);
 
-            if (brojTura >= cilj) {
-                lblProgress.setText("ČESTITAMO! Bonus ostvaren (" + brojTura + "/" + cilj + " tura)");
+            if (stvaranBrojTura >= cilj) {
+                lblProgress.setText("ČESTITAMO! Bonus ostvaren (" + stvaranBrojTura + "/" + cilj + " tura)");
                 lblProgress.setStyle("-fx-font-weight: bold; -fx-text-fill: #27ae60; -fx-font-size: 14px;");
                 pb.setProgress(1.0);
                 pb.setStyle("-fx-accent: #27ae60;");
             } else {
-                lblProgress.setText("Napredak do bonusa: još " + (cilj - brojTura) + " ture do cilja");
-                // I ovdje koristimo dynamicTextColor da se vidi u mraku
+                lblProgress.setText("Napredak do bonusa: još " + (cilj - stvaranBrojTura) + " ture do cilja");
                 lblProgress.setStyle("-fx-font-weight: bold; -fx-text-fill: " + dynamicTextColor + "; -fx-font-size: 14px;");
                 pb.setProgress(procenat);
                 pb.setStyle("-fx-accent: #6c5ce7;");
             }
             progressBox.getChildren().addAll(lblProgress, pb);
 
+            // 5. Action Panel
             VBox actionPanel = new VBox(20);
             actionPanel.setAlignment(javafx.geometry.Pos.CENTER);
             actionPanel.setPadding(new javafx.geometry.Insets(30));
             actionPanel.setMaxWidth(800);
-
-// 1. OBRISALI SMO .setStyle(...) i zamijenili sa ovom linijom:
             actionPanel.getStyleClass().add("action-card");
 
             Label lblQuestion = new Label("Trebate službeni dokument?");
-// 2. Koristimo CSS varijablu za boju teksta
             lblQuestion.setStyle("-fx-text-fill: -fx-m-text; -fx-font-size: 16px; -fx-font-weight: bold;");
 
             Label lblInfo = new Label("Generišite PDF karton sa vašim podacima.");
-// 3. Koristimo CSS varijablu za sporedni tekst
             lblInfo.setStyle("-fx-text-fill: -fx-mut-text; -fx-font-size: 13px;");
 
             Button btnPdf = new Button("PREUZMI MOJ KARTON (PDF)");
             btnPdf.getStyleClass().add("btn-pdf-premium");
             btnPdf.setOnAction(e -> handleGenerateMyDriverPDF(trenutniVozac));
 
-
-
             actionPanel.getChildren().addAll(lblQuestion, lblInfo, btnPdf);
-            // 7. DODAVANJE SVEGA U CONTENT AREA REDOM
-            contentArea.getChildren().clear(); // Očistimo za svaki slučaj prije dodavanja
+
+            // 6. Finalno dodavanje u ContentArea
+            contentArea.getChildren().clear();
             contentArea.getChildren().addAll(welcomePanel, driverCards, progressBox, actionPanel);
         }
     }

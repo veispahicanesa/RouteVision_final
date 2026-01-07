@@ -8,14 +8,19 @@ import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
+import unze.ptf.routevision_final.config.DatabaseConfig;
 import unze.ptf.routevision_final.model.Kamion;
+import unze.ptf.routevision_final.model.Narudzba;
 import unze.ptf.routevision_final.model.Tura;
 import unze.ptf.routevision_final.model.Vozac;
 import unze.ptf.routevision_final.repository.KamionDAO;
+import unze.ptf.routevision_final.repository.NarudzbaDAO;
 import unze.ptf.routevision_final.repository.TuraDAO;
 import unze.ptf.routevision_final.controller.SessionManager;
 import unze.ptf.routevision_final.repository.VozacDAO;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.time.Duration;
 import java.time.LocalDate;
@@ -57,15 +62,20 @@ public class TuraController {
     }
     private VozacDAO vozacDAO = new VozacDAO();
     private KamionDAO kamionDAO = new KamionDAO();
-
+    private NarudzbaDAO narudzbaDAO = new NarudzbaDAO();
     private void setupColumns() {
         // 1. Kolona za broj ture
         brojCol.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getBroj_tura()));
 
         // 2. Kolona za relaciju (Od -> Do)
-        relacijaCol.setCellValueFactory(c -> new SimpleStringProperty(
-                c.getValue().getLokacija_pocetka() + " -> " + c.getValue().getLokacija_kraja()));
+        // 2. Kolona za relaciju (Sada uključuje KLIJENTA i lokacije)
+        relacijaCol.setCellValueFactory(c -> {
+            // Naziv firme koji je došao iz JOIN-a u DAO
+            String klijent = (c.getValue().getNapomena() != null) ? c.getValue().getNapomena() : "N/A";
+            String gradovi = c.getValue().getLokacija_pocetka() + " -> " + c.getValue().getLokacija_kraja();
 
+            return new SimpleStringProperty(klijent + " | " + gradovi);
+        });
         // 3. Kolona za datum početka
         datumCol.setCellValueFactory(c -> new SimpleStringProperty(
                 c.getValue().getDatum_pocetka() != null ? c.getValue().getDatum_pocetka().toString() : "-"));
@@ -83,9 +93,11 @@ public class TuraController {
                 Tura tura = getTableRow().getItem();
 
                 // Provjera: ako je tura prazna, u toku ili su km 0, ispiši "-"
-                if (empty || tura == null || !"Završena".equals(tura.getStatus()) || km == null || km == 0) {
+                // Izmjeni ovaj IF u setupColumns:
+                if (empty || tura == null || km == null || km == 0) {
                     setText("-");
                 } else {
+                    // Sada će ispisati kilometre i za "Završena" i za "Prekinuta"
                     setText(km + " km");
                 }
             }
@@ -99,10 +111,13 @@ public class TuraController {
                 super.updateItem(fuel, empty);
                 Tura tura = getTableRow().getItem();
 
-                if (empty || tura == null || !"Završena".equals(tura.getStatus()) || fuel == null || fuel == 0) {
-                    setText("-");
-                } else {
+
+                if (empty || tura == null || fuel == null || fuel == 0) {
+                    setText("");
+                } else if ("Završena".equals(tura.getStatus()) || "Prekinuta".equals(tura.getStatus())) {
                     setText(String.format("%.2f L", fuel));
+                } else {
+                    setText("");
                 }
             }
         });
@@ -151,7 +166,7 @@ public class TuraController {
     }
 
     @FXML private void handleStatusInProgress() { azurirajStatus("U toku"); }
-    @FXML private void handleStatusCancel() { azurirajStatus("Prekinuta"); }
+
 
     @FXML
     private void handleZavrsiTuru() {
@@ -161,39 +176,74 @@ public class TuraController {
             return;
         }
 
-        // Otvaramo dijalog za unos kilometara
+        if ("Završena".equals(sel.getStatus())) {
+            showAlert("Upozorenje", "Ova tura je već završena.");
+            return;
+        }
+
         TextInputDialog dialog = new TextInputDialog("0");
         dialog.setTitle("Završetak ture");
         dialog.setHeaderText("Tura: " + sel.getBroj_tura());
         dialog.setContentText("Unesite ukupno pređene kilometre:");
 
-        Optional<String> result = dialog.showAndWait();
-        result.ifPresent(km -> {
+        dialog.showAndWait().ifPresent(km -> {
             try {
                 int predjeniKM = Integer.parseInt(km);
                 sel.setPrijedeni_kilometri(predjeniKM);
 
-                // Automatsko računanje potrošnje (npr. prosjek 30L/100km)
+                // Tvoja logika za gorivo i brzinu
                 double potrosnja = (predjeniKM / 100.0) * 30.0;
                 sel.setSpent_fuel(potrosnja);
                 sel.setFuel_used(potrosnja);
-
-                // Računanje prosječne brzine
                 sel.setDatum_kraja(LocalDate.now());
                 sel.setVrijeme_kraja(LocalTime.now());
                 sel.setProsjecna_brzina(izracunajBrzinu(sel, predjeniKM));
-
                 sel.setStatus("Završena");
+
+                // 1. Ažuriraj turu u bazi
                 turaDAO.update(sel);
+
+                // 2. AUTOMATSKO KREIRANJE FAKTURE
+                // Ovdje koristimo narudzba_id da bi baza znala koji je klijent u pitanju
+                kreirajFakturuAutomatski(sel);
+
                 loadData();
-                showAlert("Uspjeh", "Tura uspješno završena!");
+                tableView.refresh();
+                showAlert("Uspjeh", "Tura završena i faktura je automatski generisana!");
+
             } catch (NumberFormatException e) {
                 showAlert("Greška", "Kilometri moraju biti broj.");
             } catch (SQLException e) {
-                showAlert("Greška", "Greška pri čuvanju podataka.");
+                e.printStackTrace();
+                showAlert("Greška", "Greška pri radu sa bazom.");
             }
         });
     }
+
+    private void kreirajFakturuAutomatski(Tura tura) throws SQLException {
+        // SQL koji povlači klijent_id iz narudžbe povezane sa turom
+        String sql = "INSERT INTO fakture (broj_fakture, tura_id, klijent_id, datum_izdavanja, " +
+                "broj_km, cijena_po_km, iznos_usluge, porez, ukupan_iznos, vrsta_usluge, status_placanja) " +
+                "SELECT CONCAT('INV-', ?), t.id, n.klijent_id, CURDATE(), ?, 2.0, " +
+                "(? * 2.0), (? * 2.0 * 0.17), (? * 2.0 * 1.17), 'Prevoz robe', 'Neplaćeno' " +
+                "FROM tura t " +
+                "JOIN narudzba n ON t.narudzba_id = n.id " +
+                "WHERE t.id = ?";
+
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, tura.getBroj_tura());
+            stmt.setInt(2, tura.getId());
+            stmt.setInt(3, tura.getPrijedeni_kilometri());
+            stmt.setInt(4, tura.getPrijedeni_kilometri());
+            stmt.setInt(5, tura.getPrijedeni_kilometri());
+            stmt.setInt(6, tura.getId());
+
+            stmt.executeUpdate();
+        }
+    }
+
 
     private int izracunajBrzinu(Tura t, int km) {
         if (t.getDatum_pocetka() == null || t.getVrijeme_pocetka() == null) return 0;
@@ -220,20 +270,34 @@ public class TuraController {
 
     @FXML
     private void handleDeleteTura() {
+        // 1. Dohvati označenu turu iz tabele
         Tura sel = tableView.getSelectionModel().getSelectedItem();
-        if (sel == null) return;
 
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Obriši turu " + sel.getBroj_tura() + "?");
-        alert.showAndWait().ifPresent(response -> {
-            if (response == ButtonType.OK) {
-                try {
-                    turaDAO.delete(sel.getId());
-                    loadData();
-                } catch (SQLException e) {
-                    showAlert("Greška", "Brisanje nije uspjelo.");
-                }
+        if (sel == null) {
+            showAlert("Upozorenje", "Molimo odaberite turu koju želite obrisati.");
+            return;
+        }
+
+        // 2. Potvrda brisanja
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Potvrda brisanja");
+        alert.setHeaderText("Brisanje ture: " + sel.getBroj_tura());
+        alert.setContentText("Da li ste sigurni da želite TRAJNO obrisati ovu turu iz baze?");
+
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            try {
+                // Pozivamo DAO da izvrši fizičko brisanje
+                turaDAO.hardDelete(sel.getId());
+
+                // 3. Osvježi prikaz
+                loadData();
+                showAlert("Uspjeh", "Tura je trajno obrisana.");
+            } catch (SQLException e) {
+                e.printStackTrace();
+                showAlert("Greška", "Brisanje nije uspjelo. Moguće je da postoje fakture vezane za ovu turu.");
             }
-        });
+        }
     }
 
     private void showAlert(String title, String message) {
@@ -261,6 +325,8 @@ public class TuraController {
         TextField polaziste = new TextField();
         TextField odrediste = new TextField();
         DatePicker datum = new DatePicker(LocalDate.now());
+        TextField kmField = new TextField("0");
+        kmField.setPromptText("Unesite pređene km");
 
         // Novo: Polje za vrijeme (podrazumijevano trenutno vrijeme)
         TextField vrijemeField = new TextField(LocalTime.now().format(java.time.format.DateTimeFormatter.ofPattern("HH:mm")));
@@ -273,12 +339,12 @@ public class TuraController {
         // ComboBox-ovi za odabir vozača i kamiona
         ComboBox<Vozac> comboVozaci = new ComboBox<>();
         ComboBox<Kamion> comboKamioni = new ComboBox<>();
-
+        ComboBox<Narudzba> comboNarudzbe = new ComboBox<>();
         try {
             comboVozaci.setItems(FXCollections.observableArrayList(vozacDAO.findAll()));
             comboKamioni.setItems(FXCollections.observableArrayList(kamionDAO.findAll()));
-
-            // Postavljanje prikaza imena i registracija
+            List<Narudzba> sveNarudzbe = narudzbaDAO.findAll();
+            comboNarudzbe.setItems(FXCollections.observableArrayList(sveNarudzbe));
             comboVozaci.setConverter(new javafx.util.StringConverter<>() {
                 @Override public String toString(Vozac v) { return v == null ? "" : v.getIme() + " " + v.getPrezime(); }
                 @Override public Vozac fromString(String s) { return null; }
@@ -287,6 +353,14 @@ public class TuraController {
             comboKamioni.setConverter(new javafx.util.StringConverter<>() {
                 @Override public String toString(Kamion k) { return k == null ? "" : k.getRegistarska_tablica() + " (" + k.getMarka() + ")"; }
                 @Override public Kamion fromString(String s) { return null; }
+            });
+
+            // NOVO: Konverter za Narudžbu - da admin vidi broj narudžbe i ime klijenta
+            comboNarudzbe.setConverter(new javafx.util.StringConverter<>() {
+                @Override public String toString(Narudzba n) {
+                    return n == null ? "" : n.getBroj_narudzbe() + " | " + n.getNazivKlijenta();
+                }
+                @Override public Narudzba fromString(String s) { return null; }
             });
         } catch (SQLException e) { e.printStackTrace(); }
 
@@ -306,7 +380,8 @@ public class TuraController {
         grid.add(comboKamioni, 1, 6);
         grid.add(new Label("Status:"), 0, 7);
         grid.add(comboStatus, 1, 7);
-
+        grid.add(new Label("Vezana Narudžba:"), 0, 9);
+        grid.add(comboNarudzbe, 1, 9);
         dialog.getDialogPane().setContent(grid);
 
         dialog.setResultConverter(dialogButton -> {
@@ -322,18 +397,19 @@ public class TuraController {
                     n.setKamion_id(comboKamioni.getValue().getId());
                     n.setStatus(comboStatus.getValue());
                     n.setAktivan(true);
-
-                    // Početni kilometri su 0, gorivo se računa tek kad se tura završi
-                    n.setPrijedeni_kilometri(0);
-                    n.setSpent_fuel(0.0);
-                    n.setFuel_used(0.0);
-
+                    n.setPrijedeni_kilometri(Integer.parseInt(kmField.getText()));
+                    double potrosnja = (n.getPrijedeni_kilometri() / 100.0) * 30.0;
+                    n.setSpent_fuel(potrosnja);
+                    n.setFuel_used(potrosnja);
+                    if (comboNarudzbe.getValue() != null) {
+                        n.setNarudzba_id(comboNarudzbe.getValue().getId());
+                    }
                     if(SessionManager.getInstance() != null) {
                         n.setKreirao_admin_id(String.valueOf(SessionManager.getInstance().getUserId()));
                     }
                     return n;
                 } catch (Exception e) {
-                    showAlert("Greška", "Provjerite unos podataka (Vrijeme mora biti u formatu HH:mm)");
+                    showAlert("Greška", "Provjerite unos podataka (Kilometri moraju biti broj!)");
                     return null;
                 }
             }
@@ -372,7 +448,7 @@ public class TuraController {
 
         TextField polaziste = new TextField(odabranaTura.getLokacija_pocetka());
         TextField odrediste = new TextField(odabranaTura.getLokacija_kraja());
-
+        TextField kmField = new TextField(String.valueOf(odabranaTura.getPrijedeni_kilometri()));
         // Provjera da li je vrijeme null prije toString()
         String trenutnoVrijeme = odabranaTura.getVrijeme_pocetka() != null ? odabranaTura.getVrijeme_pocetka().toString() : "08:00";
         TextField vrijemeField = new TextField(trenutnoVrijeme);
@@ -431,6 +507,15 @@ public class TuraController {
                     if (comboKamioni.getValue() != null) odabranaTura.setKamion_id(comboKamioni.getValue().getId());
 
                     odabranaTura.setStatus(comboStatus.getValue());
+                    int noviKm = Integer.parseInt(kmField.getText());
+                    odabranaTura.setPrijedeni_kilometri(noviKm);
+                    double novaPotrosnja = (noviKm / 100.0) * 30.0;
+                    odabranaTura.setSpent_fuel(novaPotrosnja);
+                    odabranaTura.setFuel_used(novaPotrosnja);
+
+                    if (comboVozaci.getValue() != null) odabranaTura.setVozac_id(comboVozaci.getValue().getId());
+                    if (comboKamioni.getValue() != null) odabranaTura.setKamion_id(comboKamioni.getValue().getId());
+
                     return odabranaTura;
                 } catch (Exception e) {
                     // Ako vrijeme nije HH:mm, ovdje će puknuti
@@ -461,5 +546,44 @@ public class TuraController {
                 showAlert("Greška", "Baza: " + e.getMessage());
             }
         }
+    }
+    @FXML
+    private void handleStatusCancel() {
+        Tura sel = tableView.getSelectionModel().getSelectedItem();
+        if (sel == null) {
+            showAlert("Upozorenje", "Odaberite turu.");
+            return;
+        }
+
+        // Otvaramo prozor za unos kilometara iako je tura prekinuta
+        TextInputDialog dialog = new TextInputDialog("0");
+        dialog.setTitle("Prekid ture");
+        dialog.setHeaderText("Tura: " + sel.getBroj_tura());
+        dialog.setContentText("Unesite kilometre pređene do trenutka prekida:");
+
+        dialog.showAndWait().ifPresent(km -> {
+            try {
+                int predjeniKM = Integer.parseInt(km);
+                sel.setPrijedeni_kilometri(predjeniKM);
+
+                // Računamo potrošnju do prekida
+                double potrosnja = (predjeniKM / 100.0) * 30.0;
+                sel.setSpent_fuel(potrosnja);
+                sel.setFuel_used(potrosnja);
+
+                sel.setStatus("Prekinuta");
+                sel.setDatum_kraja(LocalDate.now());
+                sel.setVrijeme_kraja(LocalTime.now());
+
+                // Spašavamo u bazu
+                turaDAO.update(sel);
+                loadData();
+                showAlert("Informacija", "Tura je označena kao prekinuta sa " + predjeniKM + " pređenih km.");
+            } catch (NumberFormatException e) {
+                showAlert("Greška", "Kilometri moraju biti broj.");
+            } catch (SQLException e) {
+                showAlert("Greška", "Problem sa bazom.");
+            }
+        });
     }
 }

@@ -119,3 +119,27 @@
 .logout-button:hover .ikonli-font-icon {
     -fx-icon-color: white;
 }
+/* Dodaj ovo na kraj svog dashboard.css fajla */
+/* Stil za bijeli/tamni panel u dnu dashboarda */
+.action-card {
+    -fx-background-color: -fx-s-bg; /* Bijela u light, siva u dark */
+    -fx-background-radius: 15;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 15, 0, 0, 5);
+}
+
+.dark-mode .action-card {
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.5), 15, 0, 0, 5);
+    -fx-border-color: -fx-bord;
+    -fx-border-width: 0.5;
+}
+
+/* Stil za PDF dugme */
+.btn-pdf-premium {
+    -fx-background-color: #6c5ce7;
+    -fx-text-fill: white;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-padding: 12 25;
+    -fx-background-radius: 10;
+    -fx-cursor: hand;
+}

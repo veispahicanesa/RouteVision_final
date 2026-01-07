@@ -25,11 +25,26 @@ public class NarudzbaDAO {
 
     public List<Narudzba> findAll() throws SQLException {
         List<Narudzba> narudzbe = new ArrayList<>();
-        String query = "SELECT * FROM narudzba WHERE aktivan = TRUE ORDER BY datum_narudzbe DESC";
+        String query = "SELECT n.*, k.naziv_firme " +
+                "FROM narudzba n " +
+                "JOIN klijent k ON n.klijent_id = k.id " +
+                "WHERE n.aktivan = TRUE ORDER BY n.datum_narudzbe DESC";
+
         try (Connection conn = DatabaseConfig.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
-            ResultSet rs = stmt.executeQuery();
-            while (rs.next()) narudzbe.add(mapResultSetToNarudzba(rs));
+             PreparedStatement stmt = conn.prepareStatement(query);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                // 1. Mapiramo osnovne podatke iz RS u objekt
+                Narudzba n = mapResultSetToNarudzba(rs);
+
+                // 2. Ručno dodajemo naziv firme koji je došao preko JOIN-a
+                // Ovo radimo UNUTAR while petlje dok je ResultSet još na tom redu
+                n.setNazivKlijenta(rs.getString("naziv_firme"));
+
+                // 3. Dodajemo potpuno popunjen objekt u listu
+                narudzbe.add(n);
+            }
         }
         return narudzbe;
     }

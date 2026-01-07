@@ -159,7 +159,7 @@ public class KamionManagementController {
         grid.add(new Label("Model:"), 0, 2);        grid.add(modelField, 1, 2);
         grid.add(new Label("Godina:"), 0, 3);       grid.add(godinaField, 1, 3);
         grid.add(new Label("Nosivost (t):"), 0, 4); grid.add(nosivostField, 1, 4);
-        grid.add(new Label("KM:"), 0, 5);           grid.add(kmField, 1, 5);
+        grid.add(new Label("km:"), 0, 5);           grid.add(kmField, 1, 5);
         grid.add(new Label("Datum Reg:"), 0, 6);    grid.add(regDate, 1, 6);
         grid.add(new Label("Vozač:"), 0, 7);        grid.add(vozacCombo, 1, 7);
         dialog.getDialogPane().setContent(grid);
@@ -215,16 +215,24 @@ public class KamionManagementController {
 
         ComboBox<unze.ptf.routevision_final.model.Vozac> vozacCombo = new ComboBox<>();
         try {
+            // 1. Učitaj sve vozače u ComboBox
             List<unze.ptf.routevision_final.model.Vozac> sviVozaci = new unze.ptf.routevision_final.repository.VozacDAO().findAll();
             vozacCombo.setItems(FXCollections.observableArrayList(sviVozaci));
-            // Pronalaženje trenutnog vozača u listi
-            for (unze.ptf.routevision_final.model.Vozac v : sviVozaci) {
-                if (v.getId() == selected.getZaduzeni_vozac_id()) {
-                    vozacCombo.setValue(v);
-                    break;
+
+            // 2. Pronalaženje trenutnog vozača u listi - SIGURNA PROVJERA
+            if (selected.getZaduzeni_vozac_id() != null) {
+                for (unze.ptf.routevision_final.model.Vozac v : sviVozaci) {
+                    if (v.getId() == selected.getZaduzeni_vozac_id().intValue()) {
+                        vozacCombo.setValue(v);
+                        break;
+                    }
                 }
+            } else {
+                vozacCombo.setValue(null);
             }
-        } catch (SQLException e) { e.printStackTrace(); }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 
         // --- PRAVILO: Vozač ne može mijenjati ko vozi kamion ---
         if ("Vozač".equalsIgnoreCase(SessionManager.getInstance().getUserRole())) {
@@ -237,7 +245,7 @@ public class KamionManagementController {
         grid.add(new Label("Model:"), 0, 2);        grid.add(modelField, 1, 2);
         grid.add(new Label("Godina:"), 0, 3);       grid.add(godinaField, 1, 3);
         grid.add(new Label("Nosivost:"), 0, 4);     grid.add(nosivostField, 1, 4);
-        grid.add(new Label("KM:"), 0, 5);           grid.add(kmField, 1, 5);
+        grid.add(new Label("km:"), 0, 5);           grid.add(kmField, 1, 5);
         grid.add(new Label("Datum Reg:"), 0, 6);    grid.add(regDate, 1, 6);
         grid.add(new Label("Vozač:"), 0, 7);        grid.add(vozacCombo, 1, 7);
 
@@ -245,34 +253,18 @@ public class KamionManagementController {
         dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 
         dialog.showAndWait().ifPresent(result -> {
-            if (result == ButtonType.OK) {
-                try {
-                    // Ažuriramo objekat podacima iz polja
-                    selected.setRegistarska_tablica(regField.getText());
-                    selected.setMarka(markaField.getText());
-                    selected.setModel(modelField.getText());
-                    selected.setStanje_kilometra(Integer.parseInt(kmField.getText()));
-                    selected.setGodina_proizvodnje(Integer.parseInt(godinaField.getText()));
-                    selected.setKapacitet_tone(Double.parseDouble(nosivostField.getText()));
-                    selected.setDatum_registracije(regDate.getValue());
-
-                    // Samo ako je Admin (odnosno ako ComboBox nije ugašen), mijenjamo ID vozača
-                    if (!vozacCombo.isDisable() && vozacCombo.getValue() != null) {
-                        selected.setZaduzeni_vozac_id(vozacCombo.getValue().getId());
-                        selected.setIme_vozaca(vozacCombo.getValue().getIme());
-                        selected.setPrezime_vozaca(vozacCombo.getValue().getPrezime());
-                    }
-
-                    // SPAŠAVANJE U BAZU
-                    kamionDAO.update(selected);
-
-                    loadKamionData();
-                    tableView.setItems(kamionList);
-                    tableView.refresh();
-
-                    showAlert("Uspjeh", "Podaci o kamionu su ažurirani!");
-                } catch (Exception e) {
-                    showAlert("Greška", "Provjerite unos (posebno brojeve za KM i Godinu)!");
+            // Kod za spašavanje (unutar OK klika)
+            if (!vozacCombo.isDisable()) {
+                unze.ptf.routevision_final.model.Vozac selektovaniVozac = vozacCombo.getValue();
+                if (selektovaniVozac != null) {
+                    selected.setZaduzeni_vozac_id(selektovaniVozac.getId());
+                    selected.setIme_vozaca(selektovaniVozac.getIme());
+                    selected.setPrezime_vozaca(selektovaniVozac.getPrezime());
+                } else {
+                    // Ako je administrator ispraznio izbor vozača
+                    selected.setZaduzeni_vozac_id(null);
+                    selected.setIme_vozaca(null);
+                    selected.setPrezime_vozaca(null);
                 }
             }
         });

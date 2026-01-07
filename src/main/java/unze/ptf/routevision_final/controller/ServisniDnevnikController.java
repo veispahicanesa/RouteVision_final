@@ -7,6 +7,7 @@ import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
 import unze.ptf.routevision_final.model.ServisniDnevnik;
 import unze.ptf.routevision_final.repository.ServisniDnevnikDAO;
 import unze.ptf.routevision_final.repository.KamionDAO;
@@ -29,25 +30,40 @@ public class ServisniDnevnikController {
     @FXML private TableColumn<ServisniDnevnik, Double> trosciCol;
     @FXML private TableColumn<ServisniDnevnik, String> servisarCol;
     @FXML private TableColumn<ServisniDnevnik, String> korisnikCol;
-
+    @FXML private VBox mainContainer;
     private ServisniDnevnikDAO dao = new ServisniDnevnikDAO();
 
     @FXML
     public void initialize() {
+
         setupTableColumns();
         loadDnevnikData();
     }
 
-
     private void setupTableColumns() {
-        // 1. Redni broj (ostaje isto)
+        // 1. Redni broj - POPRAVLJENO
         idCol.setCellFactory(column -> new TableCell<>() {
             @Override
             protected void updateItem(Integer item, boolean empty) {
                 super.updateItem(item, empty);
-                setText(empty ? null : String.valueOf(getIndex() + 1));
+
+                if (empty) {
+                    setText(null);
+                    setStyle("");
+                } else {
+                    setText(String.valueOf(getIndex() + 1));
+
+
+                    if (!getStyleClass().contains("table-cell")) {
+                        getStyleClass().add("table-cell");
+                    }
+                    setStyle("-fx-alignment: CENTER;");
+                }
             }
         });
+
+
+
 
 
         kamionCol.setCellValueFactory(cellData -> new SimpleStringProperty(
@@ -70,13 +86,16 @@ public class ServisniDnevnikController {
                 super.updateItem(price, empty);
                 if (empty || price == null) {
                     setText(null);
-                    setStyle("");
+                    getStyleClass().removeAll("skupo", "jeftino");
                 } else {
                     setText(String.format("%.2f KM", price));
+
+                    // OVO JE KLJUČNO: Ne koristi setStyle, nego klase
+                    getStyleClass().removeAll("skupo", "jeftino");
                     if (price > 1000) {
-                        setStyle("-fx-text-fill: #e74c3c; -fx-font-weight: bold;");
+                        getStyleClass().add("skupo");
                     } else {
-                        setStyle("-fx-text-fill: #27ae60;");
+                        getStyleClass().add("jeftino");
                     }
                 }
             }

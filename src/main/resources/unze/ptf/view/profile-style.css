@@ -27,11 +27,12 @@
 /* --- OPTIMIZOVAN NASLOV --- */
 .title-label {
     -fx-font-family: "Segoe UI Semibold";
-    -fx-font-size: 34px;               /* Smanjeno sa 42px na 34px */
-    -fx-text-fill: #1E293B;
-    -fx-padding: 10 0 15 0;
+    -fx-font-size: 34px;               /* Blago uvećano */
+    -fx-text-fill: #1E293B;            /* Tamna boja za Light Mode */
+    -fx-padding: 10 0 10 0;
+    /* ŽUTA LINIJA ISPOD */
     -fx-border-color: transparent transparent #F59E0B transparent;
-    -fx-border-width: 0 0 4 0;
+    -fx-border-width: 0 0 4 0;         /* Debljina linije 4px */
 }
 
 /* KARTICE */

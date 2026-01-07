@@ -145,9 +145,9 @@ public class DashboardController {
             // 2. Naslov i dobrodošlica
             VBox welcomePanel = new VBox(10);
             Label lblMain = new Label("Dobrodošli nazad, " + trenutniVozac.getIme() + "!");
-            // Popravljamo boju naslova za tamni mod
-            lblMain.setStyle("-fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: " + dynamicTextColor + ";");
+            lblMain.setStyle("-fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: -fx-m-text;");
             welcomePanel.getChildren().add(lblMain);
+
 
 
             // 3. Statističke kartice
@@ -185,25 +185,27 @@ public class DashboardController {
             }
             progressBox.getChildren().addAll(lblProgress, pb);
 
-            // 5. KREIRANJE DUGMETA (Mora biti prije actionPanel.getChildren().add)
-            Button btnPdf = new Button("PREUZMI MOJ KARTON (PDF)");
-            btnPdf.setStyle("-fx-background-color: #6c5ce7; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-padding: 12 25; -fx-background-radius: 10; -fx-cursor: hand;");
-            btnPdf.setOnAction(e -> handleGenerateMyDriverPDF(trenutniVozac));
-
             VBox actionPanel = new VBox(20);
             actionPanel.setAlignment(javafx.geometry.Pos.CENTER);
             actionPanel.setPadding(new javafx.geometry.Insets(30));
-            actionPanel.setMaxWidth(800); // Da ne bude razvučen preko cijelog ekrana
+            actionPanel.setMaxWidth(800);
 
-            actionPanel.setStyle("-fx-background-color: " + dynamicPanelColor + "; " +
-                    "-fx-background-radius: 15; " +
-                    "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.4), 15, 0, 0, 0);");
+// 1. OBRISALI SMO .setStyle(...) i zamijenili sa ovom linijom:
+            actionPanel.getStyleClass().add("action-card");
 
             Label lblQuestion = new Label("Trebate službeni dokument?");
-            lblQuestion.setStyle("-fx-text-fill: " + dynamicTextColor + "; -fx-font-size: 16px; -fx-font-weight: bold;");
+// 2. Koristimo CSS varijablu za boju teksta
+            lblQuestion.setStyle("-fx-text-fill: -fx-m-text; -fx-font-size: 16px; -fx-font-weight: bold;");
 
             Label lblInfo = new Label("Generišite PDF karton sa vašim podacima.");
-            lblInfo.setStyle("-fx-text-fill: " + dynamicSubText + "; -fx-font-size: 13px;");
+// 3. Koristimo CSS varijablu za sporedni tekst
+            lblInfo.setStyle("-fx-text-fill: -fx-mut-text; -fx-font-size: 13px;");
+
+            Button btnPdf = new Button("PREUZMI MOJ KARTON (PDF)");
+            btnPdf.getStyleClass().add("btn-pdf-premium");
+            btnPdf.setOnAction(e -> handleGenerateMyDriverPDF(trenutniVozac));
+
+
 
             actionPanel.getChildren().addAll(lblQuestion, lblInfo, btnPdf);
             // 7. DODAVANJE SVEGA U CONTENT AREA REDOM

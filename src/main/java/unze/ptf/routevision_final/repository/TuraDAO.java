@@ -10,12 +10,25 @@ public class TuraDAO {
 
     public List<Tura> findAll() throws SQLException {
         List<Tura> ture = new ArrayList<>();
-        String query = "SELECT * FROM tura WHERE aktivan = TRUE";
+
+        // SQL izmijenjen na LEFT JOIN
+        String query = "SELECT t.*, k.naziv_firme " +
+                "FROM tura t " +
+                "LEFT JOIN narudzba n ON t.narudzba_id = n.id " +
+                "LEFT JOIN klijent k ON n.klijent_id = k.id " +
+                "WHERE t.aktivan = TRUE";
+
         try (Connection conn = DatabaseConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query);
              ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
-                ture.add(mapResultSetToTura(rs)); // mapResultSetToTura MORA kreirati novi Tura()
+                Tura t = mapResultSetToTura(rs);
+
+                // Uzimamo naziv firme, ako je NULL (nema narudžbe), stavljamo tekst
+                String firma = rs.getString("naziv_firme");
+                t.setNapomena(firma != null ? firma : "Nema klijenta");
+
+                ture.add(t);
             }
         }
         return ture;
@@ -39,7 +52,6 @@ public class TuraDAO {
         return ture;
     }
 
-    // 3. Spremanje nove ture u bazu
     public void save(Tura tura) throws SQLException {
         String query = "INSERT INTO tura (broj_ture, vozac_id, kamion_id, narudzba_id, datum_pocetka, " +
                 "vrijeme_pocetka, lokacija_pocetka, lokacija_kraja, status, napomena, aktivan, kreirao_admin_id, kreirao_vozac_id, datum_kreiranja) " +
@@ -51,7 +63,13 @@ public class TuraDAO {
             stmt.setString(1, tura.getBroj_tura());
             stmt.setInt(2, tura.getVozac_id());
             stmt.setInt(3, tura.getKamion_id());
-            stmt.setInt(4, tura.getNarudzba_id());
+
+            if (tura.getNarudzba_id() != 0) {
+                stmt.setInt(4, tura.getNarudzba_id());
+            } else {
+                stmt.setNull(4, java.sql.Types.INTEGER);
+            }
+
             stmt.setDate(5, tura.getDatum_pocetka() != null ? Date.valueOf(tura.getDatum_pocetka()) : Date.valueOf(java.time.LocalDate.now()));
             stmt.setTime(6, tura.getVrijeme_pocetka() != null ? Time.valueOf(tura.getVrijeme_pocetka()) : Time.valueOf(java.time.LocalTime.now()));
             stmt.setString(7, tura.getLokacija_pocetka());
@@ -59,7 +77,13 @@ public class TuraDAO {
             stmt.setString(9, tura.getStatus() != null ? tura.getStatus() : "U toku");
             stmt.setString(10, tura.getNapomena());
             stmt.setBoolean(11, true);
-            stmt.setString(12, tura.getKreirao_admin_id());
+
+            if (tura.getKreirao_admin_id() != null && !tura.getKreirao_admin_id().isEmpty()) {
+                stmt.setInt(12, Integer.parseInt(tura.getKreirao_admin_id()));
+            } else {
+                stmt.setNull(12, java.sql.Types.INTEGER);
+            }
+
             stmt.setString(13, tura.getKreirao_vozac_id());
 
             stmt.executeUpdate();
@@ -68,29 +92,36 @@ public class TuraDAO {
 
 
     public void update(Tura tura) throws SQLException {
-        String query = "UPDATE tura SET status = ?, prijedeni_kilometri = ?, prosjecna_brzina = ?, " +
-                "datum_kraja = ?, vrijeme_kraja = ?, spent_fuel = ?, fuel_used = ?, " +
-                "lokacija_pocetka = ?, lokacija_kraja = ?, vrijeme_pocetka = ?, " +
-                "vozac_id = ?, kamion_id = ? WHERE id = ?";
+        // SQL upit koji uključuje SVA polja potrebna za završetak ture
+        String query = "UPDATE tura SET status = ?, prijedeni_kilometri = ?, spent_fuel = ?, fuel_used = ?, " +
+                "prosjecna_brzina = ?, datum_kraja = ?, vrijeme_kraja = ?, " +
+                "lokacija_pocetka = ?, lokacija_kraja = ?, vrijeme_pocetka = ? " +
+                "WHERE id = ?";
 
         try (Connection conn = DatabaseConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
 
             stmt.setString(1, tura.getStatus());
             stmt.setInt(2, tura.getPrijedeni_kilometri());
-            stmt.setInt(3, tura.getProsjecna_brzina());
-            stmt.setDate(4, tura.getDatum_kraja() != null ? Date.valueOf(tura.getDatum_kraja()) : null);
-            stmt.setTime(5, tura.getVrijeme_kraja() != null ? Time.valueOf(tura.getVrijeme_kraja()) : null);
-            stmt.setDouble(6, tura.getSpent_fuel());
-            stmt.setDouble(7, tura.getFuel_used());
+            stmt.setDouble(3, tura.getSpent_fuel()); // Ovo je tvoj izračun iz kontrolera
+            stmt.setDouble(4, tura.getFuel_used());
+            stmt.setInt(5, tura.getProsjecna_brzina());
+            stmt.setDate(6, tura.getDatum_kraja() != null ? Date.valueOf(tura.getDatum_kraja()) : null);
+            stmt.setTime(7, tura.getVrijeme_kraja() != null ? Time.valueOf(tura.getVrijeme_kraja()) : null);
             stmt.setString(8, tura.getLokacija_pocetka());
             stmt.setString(9, tura.getLokacija_kraja());
-            stmt.setTime(10, Time.valueOf(tura.getVrijeme_pocetka()));
-            stmt.setInt(11, tura.getVozac_id());
-            stmt.setInt(12, tura.getKamion_id());
-            stmt.setInt(13, tura.getId());
+            stmt.setTime(10, tura.getVrijeme_pocetka() != null ? Time.valueOf(tura.getVrijeme_pocetka()) : null);
 
-            stmt.executeUpdate();
+            // ID mora biti na zadnjem mjestu (11. upitnik)
+            stmt.setInt(11, tura.getId());
+
+            int rows = stmt.executeUpdate();
+            System.out.println("SQL IZVRŠEN: Izmijenjeno redova: " + rows + " za ID: " + tura.getId() +
+                    " | Gorivo: " + tura.getSpent_fuel() + " L");
+
+            if (rows == 0) {
+                throw new SQLException("Update nije uspio, tura sa ID " + tura.getId() + " nije pronađena!");
+            }
         }
     }
 
@@ -214,5 +245,13 @@ public class TuraDAO {
             }
         }
         return klijenti;
+    }
+    public void hardDelete(int id) throws SQLException {
+        String query = "DELETE FROM tura WHERE id = ?";
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setInt(1, id);
+            stmt.executeUpdate();
+        }
     }
 }

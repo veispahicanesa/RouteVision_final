@@ -23,7 +23,7 @@ public class Narudzba {
     private String status;
     private boolean aktivan;
     private LocalDateTime datum_kreiranja;
-
+    private String nazivKlijenta;
     public Narudzba() {}
 
 
@@ -76,4 +76,13 @@ public class Narudzba {
 
     public LocalDateTime getDatum_kreiranja() { return datum_kreiranja; }
     public void setDatum_kreiranja(LocalDateTime datum_kreiranja) { this.datum_kreiranja = datum_kreiranja; }
+
+    public String getNazivKlijenta() {
+        return nazivKlijenta;
+    }
+
+    public void setNazivKlijenta(String nazivKlijenta) {
+        this.nazivKlijenta = nazivKlijenta;
+    }
 }
+

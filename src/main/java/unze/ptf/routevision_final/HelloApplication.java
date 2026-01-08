@@ -62,4 +62,17 @@ public class HelloApplication extends Application {
             root.getStyleClass().remove("dark-mode");
         }
     }
+
+    public static void Main(String[] args) {
+        try {
+            launch(args);
+        }catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Pritisnuti enter za izlazak:");
+            try {
+                System.in.read();
+            }catch (Exception Ignored) {
+            }
+        }
+    }
 }

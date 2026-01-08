@@ -138,8 +138,7 @@ public class TuraController {
         kamionCol.setCellValueFactory(c -> {
             int id = c.getValue().getKamion_id();
             try {
-                // Pronađite kamion po ID-u (provjerite imate li findById u KamionDAO)
-                // Ako nemate findById, možemo koristiti findAll i filtrirati
+
                 List<Kamion> svi = kamionDAO.findAll();
                 Optional<Kamion> k = svi.stream().filter(kam -> kam.getId() == id).findFirst();
                 if (k.isPresent()) {
@@ -157,11 +156,26 @@ public class TuraController {
 
     private void loadData() {
         try {
-            List<Tura> svjezeTure = turaDAO.findAll();
-            tableView.getItems().clear(); // POTPUNO OBRIŠI TRENUTNI PRIKAZ
-            tableView.getItems().addAll(svjezeTure); // DODAJ SVE PONOVO KAO NOVE STAVKE
+            SessionManager session = SessionManager.getInstance();
+            List<Tura> prikazTura;
+
+            // Ako je korisnik Admin, vidi sve ture
+            if ("Admin".equals(session.getUserRole())) {
+                prikazTura = turaDAO.findAll();
+            }
+            // Ako je korisnik Vozac, vidi samo svoje ture preko svog ID-a
+            else {
+                Vozac ulogovaniVozac = (Vozac) session.getCurrentUser();
+                prikazTura = turaDAO.findByVozacId(ulogovaniVozac.getId());
+            }
+
+            tableView.getItems().clear();
+            tableView.getItems().addAll(prikazTura);
+            tableView.refresh(); // Osigurava da se UI osvježi
+
         } catch (SQLException e) {
-            showAlert("Greška", "Učitavanje neuspješno.");
+            e.printStackTrace();
+            showAlert("Greška", "Učitavanje neuspješno: " + e.getMessage());
         }
     }
 
@@ -203,8 +217,7 @@ public class TuraController {
                 // 1. Ažuriraj turu u bazi
                 turaDAO.update(sel);
 
-                // 2. AUTOMATSKO KREIRANJE FAKTURE
-                // Ovdje koristimo narudzba_id da bi baza znala koji je klijent u pitanju
+
                 kreirajFakturuAutomatski(sel);
 
                 loadData();

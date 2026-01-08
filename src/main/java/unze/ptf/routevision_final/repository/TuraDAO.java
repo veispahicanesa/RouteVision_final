@@ -103,7 +103,7 @@ public class TuraDAO {
 
             stmt.setString(1, tura.getStatus());
             stmt.setInt(2, tura.getPrijedeni_kilometri());
-            stmt.setDouble(3, tura.getSpent_fuel()); // Ovo je tvoj izračun iz kontrolera
+            stmt.setDouble(3, tura.getSpent_fuel());
             stmt.setDouble(4, tura.getFuel_used());
             stmt.setInt(5, tura.getProsjecna_brzina());
             stmt.setDate(6, tura.getDatum_kraja() != null ? Date.valueOf(tura.getDatum_kraja()) : null);
@@ -241,7 +241,7 @@ public class TuraDAO {
             while (rs.next()) {
                 String klijent = rs.getString("naziv_firme");
                 double iznos = rs.getDouble("ukupno");
-                klijenti.add(klijent + ": " + String.format("%.2f", iznos) + " KM");
+                klijenti.add(klijent + ": " + String.format("%.2f", iznos) + " km");
             }
         }
         return klijenti;

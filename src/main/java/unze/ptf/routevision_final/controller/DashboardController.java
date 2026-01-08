@@ -232,12 +232,13 @@ public class DashboardController {
     private void createDynamicMenu() {
         String userRole = sessionManager.getUserRole();
         sideMenu.getChildren().clear();
+
         Button homeBtn = createMenuBtn("POČETNA STRANA", e -> handleHome());
-        homeBtn.getStyleClass().add("menu-button-home"); // Poseban stil za Home
+        homeBtn.getStyleClass().add("menu-button-home");
         sideMenu.getChildren().add(homeBtn);
+
         if ("Admin".equals(userRole)) {
             sideMenu.getChildren().addAll(
-
                     createMenuBtn("Profil", e -> showProfile()),
                     createMenuBtn("Administratori", e -> showAdmini()),
                     createMenuBtn("Vozači", e -> showVozaci()),
@@ -246,7 +247,9 @@ public class DashboardController {
                     createMenuBtn("Klijenti", e -> showKlijenti()),
                     createMenuBtn("Fakture", e -> showFakture()),
                     createMenuBtn("Servisni Dnevnik", e -> showServisniDnevnik()),
-                    createMenuBtn("Ture", e -> showTura()) // Popravljeno gniježđenje
+                    // DODANO: Narudžbe prije Tura
+                    createMenuBtn("Narudžbe", e -> showNarudzbe()),
+                    createMenuBtn("Ture", e -> showTura())
             );
         } else {
             sideMenu.getChildren().addAll(
@@ -258,6 +261,10 @@ public class DashboardController {
                     createMenuBtn("Fakture/Računi", e -> showFakture())
             );
         }
+    }
+
+    private void showNarudzbe() {
+        loadView("NarudzbaView.fxml");
     }
 
     private Button createMenuBtn(String text, javafx.event.EventHandler<javafx.event.ActionEvent> event) {
@@ -482,14 +489,23 @@ public class DashboardController {
     }
     private String getQRCodeBase64(String text) {
         try {
-            // Koristimo javni API za generisanje, ali ga čitamo kroz Javu
-            String url = "https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=" + text;
+            // Popravka: Enkodiranje teksta tako da razmaci postanu %20
+            String encodedData = java.net.URLEncoder.encode(text, "UTF-8");
+            String url = "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=" + encodedData;
+
             java.net.URL imageUrl = new java.net.URL(url);
-            java.io.InputStream is = imageUrl.openStream();
-            byte[] bytes = is.readAllBytes();
-            return "data:image/png;base64," + java.util.Base64.getEncoder().encodeToString(bytes);
+            java.net.URLConnection connection = imageUrl.openConnection();
+            connection.setConnectTimeout(5000); // 5 sekundi limit
+            connection.setReadTimeout(5000);
+
+            try (java.io.InputStream is = connection.getInputStream()) {
+                byte[] bytes = is.readAllBytes();
+                return "data:image/png;base64," + java.util.Base64.getEncoder().encodeToString(bytes);
+            }
         } catch (Exception e) {
-            return "";
+            System.err.println("QR Greška: " + e.getMessage());
+            // Vrati prazan transparentni pixel ako API ne radi, da PDF ne pukne
+            return "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
         }
     }
     private void handleGenerateMyDriverPDF(Vozac vozac) {

@@ -35,7 +35,7 @@
                 <TableColumn fx:id="vrijemeCol" prefWidth="80.0" text="Vrijeme" />
                 <TableColumn fx:id="vozacCol" prefWidth="120.0" text="Vozač" />
                 <TableColumn fx:id="kamionCol" prefWidth="100.0" text="Kamion" />
-                <TableColumn fx:id="kmCol" prefWidth="80.0" text="KM" />
+                <TableColumn fx:id="kmCol" prefWidth="80.0" text="km" />
                 <TableColumn fx:id="gorivoCol" prefWidth="100.0" text="Gorivo (L)" />
                 <TableColumn fx:id="statusCol" prefWidth="100.0" text="Status" />
             </columns>
